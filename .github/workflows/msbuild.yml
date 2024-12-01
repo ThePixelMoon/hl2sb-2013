@@ -43,6 +43,10 @@ jobs:
       shell: cmd
       run: creategameprojects.bat
 
+    - working-directory: ./mp/src
+      shell: bash
+      run: ./devtools/fixsln.sh games.sln
+
     - name: Build
       working-directory: ${{github.workspace}}
       # Add additional options to the MSBuild command line here (like platform or verbosity level).
