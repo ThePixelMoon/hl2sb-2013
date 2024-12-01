@@ -24,4 +24,4 @@ ARGG is used by Half-Life 2: Sandbox to implement rotational functionality for
 the physics manipulator.
 
 ## License
-GNU Affero General Public License v3.0
+GNU Affero General Public License v3.0, Source 1 SDK License
