@@ -7,7 +7,7 @@ name: MSBuild
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "master", "feature/msbuild" ]
   pull_request:
     branches: [ "master" ]
 
