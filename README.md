@@ -1,6 +1,7 @@
 # hl2sb-2013
 
 ## Team Sandbox
+Vlad Chudov  
 Andrew McWatters  
 Matthias Moninger  
 Jacob Robbins  
