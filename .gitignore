@@ -54,3 +54,10 @@ config.cfg
 # shader files
 *.tmp
 
+*.lib
+.vs
+Debug*/
+Release*/
+*.vcxproj.*
+*.vpc.sentinel
+*.pdb
