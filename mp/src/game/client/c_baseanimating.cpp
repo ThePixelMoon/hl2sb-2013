@@ -4672,6 +4672,9 @@ C_BaseAnimating *C_BaseAnimating::CreateRagdollCopy()
 	return pRagdoll;
 }
 
+// Function uses '18452' bytes of stack.Consider moving some data to heap.
+#pragma warning( push )
+#pragma warning( disable : 6262 )
 C_BaseAnimating *C_BaseAnimating::BecomeRagdollOnClient()
 {
 	MoveToLastReceivedPosition( true );
@@ -4704,6 +4707,7 @@ C_BaseAnimating *C_BaseAnimating::BecomeRagdollOnClient()
 
 	return pRagdoll;
 }
+#pragma warning( pop )
 
 bool C_BaseAnimating::InitAsClientRagdoll( const matrix3x4_t *pDeltaBones0, const matrix3x4_t *pDeltaBones1, const matrix3x4_t *pCurrentBonePosition, float boneDt, bool bFixedConstraints )
 {
@@ -6089,7 +6093,10 @@ void C_BaseAnimating::DoMuzzleFlash()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+#pragma warning( push )
+#pragma warning( disable : 28251 )
 void DevMsgRT( char const* pMsg, ... )
+#pragma warning( pop )
 {
 	if (gpGlobals->frametime != 0.0f)
 	{
@@ -6244,7 +6251,10 @@ void C_BaseAnimating::GetToolRecordingState( KeyValues *msg )
 
 	// Force the animation to drive bones
 	CStudioHdr *hdr = GetModelPtr();
+#pragma warning( push )
+#pragma warning( disable : 6255 )
 	matrix3x4_t *pBones = (matrix3x4_t*)_alloca( ( hdr ? hdr->numbones() : 1 ) * sizeof(matrix3x4_t) );
+#pragma warning( pop )
 	if ( hdr )
 	{
 		SetupBones( pBones, hdr->numbones(), BONE_USED_BY_ANYTHING, gpGlobals->curtime );
