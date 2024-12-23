@@ -1,0 +1,13 @@
+diff a/mp/src/public/cdll_int.h b/mp/src/public/cdll_int.h	(rejected hunks)
+@@ -496,11 +496,6 @@ public:
+ 	// Methods to set/get a gamestats data container so client & server running in same process can send combined data
+ 	virtual void SetGamestatsData( CGamestatsData *pGamestatsData ) = 0;
+ 	virtual CGamestatsData *GetGamestatsData() = 0;
+-
+-	// Returns true if the engine is playing back a "locally recorded" demo, which includes
+-	// both SourceTV and replay demos, since they're recorded locally (on servers), as opposed
+-	// to a client recording a demo while connected to a remote server.
+-	virtual bool IsPlayingDemoALocallyRecordedDemo() = 0;
+ };
+ 
+ 

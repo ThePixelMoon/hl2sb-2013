@@ -16,6 +16,12 @@
 
 #include "weapon_hl2mpbasehlmpcombatweapon.h"
 
+#ifdef HL2SB
+#ifndef CLIENT_DLL
+#include "gamestats.h"
+#endif
+#endif
+
 #ifdef CLIENT_DLL
 #define CWeaponShotgun C_WeaponShotgun
 #endif
@@ -36,16 +42,52 @@ private:
 	CNetworkVar( bool,	m_bDelayedFire1 );	// Fire primary when finished reloading
 	CNetworkVar( bool,	m_bDelayedFire2 );	// Fire secondary when finished reloading
 	CNetworkVar( bool,	m_bDelayedReload );	// Reload when finished pump
+#ifdef HL2SB
+	CNetworkVar( bool,	m_bInReload );
+#endif
 
 public:
+#ifdef HL2SB
+	void	Precache( void );
+
+#ifndef CLIENT_DLL
+	int CapabilitiesGet( void ) { return bits_CAP_WEAPON_RANGE_ATTACK1; }
+#endif
+#endif
+
 	virtual const Vector& GetBulletSpread( void )
 	{
+#ifdef HL2SB
+#ifndef CLIENT_DLL
+		static Vector vitalAllyCone = VECTOR_CONE_3DEGREES;
+#endif
+#endif
 		static Vector cone = VECTOR_CONE_10DEGREES;
+
+#ifdef HL2SB
+#ifndef CLIENT_DLL
+		if( GetOwner() && (GetOwner()->Classify() == CLASS_PLAYER_ALLY_VITAL) )
+		{
+			// Give Alyx's shotgun blasts more a more directed punch. She needs
+			// to be at least as deadly as she would be with her pistol to stay interesting (sjb)
+			return vitalAllyCone;
+		}
+#endif
+#endif
+
 		return cone;
 	}
 
 	virtual int				GetMinBurst() { return 1; }
 	virtual int				GetMaxBurst() { return 3; }
+
+#ifdef HL2SB
+	bool Holster( CBaseCombatWeapon *pSwitchingTo );
+	virtual float			GetMinRestTime();
+	virtual float			GetMaxRestTime();
+
+	virtual float			GetFireRate( void );
+#endif
 
 	bool StartReload( void );
 	bool Reload( void );
@@ -79,11 +121,17 @@ BEGIN_NETWORK_TABLE( CWeaponShotgun, DT_WeaponShotgun )
 	RecvPropBool( RECVINFO( m_bDelayedFire1 ) ),
 	RecvPropBool( RECVINFO( m_bDelayedFire2 ) ),
 	RecvPropBool( RECVINFO( m_bDelayedReload ) ),
+#ifdef HL2SB
+	RecvPropBool( RECVINFO( m_bInReload ) ),
+#endif
 #else
 	SendPropBool( SENDINFO( m_bNeedPump ) ),
 	SendPropBool( SENDINFO( m_bDelayedFire1 ) ),
 	SendPropBool( SENDINFO( m_bDelayedFire2 ) ),
 	SendPropBool( SENDINFO( m_bDelayedReload ) ),
+#ifdef HL2SB
+	SendPropBool( SENDINFO( m_bInReload ) ),
+#endif
 #endif
 END_NETWORK_TABLE()
 
@@ -93,6 +141,9 @@ BEGIN_PREDICTION_DATA( CWeaponShotgun )
 	DEFINE_PRED_FIELD( m_bDelayedFire1, FIELD_BOOLEAN, FTYPEDESC_INSENDTABLE ),
 	DEFINE_PRED_FIELD( m_bDelayedFire2, FIELD_BOOLEAN, FTYPEDESC_INSENDTABLE ),
 	DEFINE_PRED_FIELD( m_bDelayedReload, FIELD_BOOLEAN, FTYPEDESC_INSENDTABLE ),
+#ifdef HL2SB
+	DEFINE_PRED_FIELD( m_bInReload, FIELD_BOOLEAN, FTYPEDESC_INSENDTABLE ),
+#endif
 END_PREDICTION_DATA()
 #endif
 
@@ -317,7 +368,17 @@ void CWeaponShotgun::PrimaryAttack( void )
 	Vector	vecSrc		= pPlayer->Weapon_ShootPosition( );
 	Vector	vecAiming	= pPlayer->GetAutoaimVector( AUTOAIM_10DEGREES );	
 
+#ifdef HL2SB
+#ifndef CLIENT_DLL
+	pPlayer->SetMuzzleFlashTime( gpGlobals->curtime + 1.0 );
+#endif
+#endif
+
+#ifndef HL2SB
 	FireBulletsInfo_t info( 7, vecSrc, vecAiming, GetBulletSpread(), MAX_TRACE_LENGTH, m_iPrimaryAmmoType );
+#else
+	FireBulletsInfo_t info( sk_plr_num_shotgun_pellets.GetInt(), vecSrc, vecAiming, GetBulletSpread(), MAX_TRACE_LENGTH, m_iPrimaryAmmoType );
+#endif
 	info.m_pAttacker = pPlayer;
 
 	// Fire the bullets, and force the first shot to be perfectly accuracy
@@ -327,6 +388,12 @@ void CWeaponShotgun::PrimaryAttack( void )
 	punch.Init( SharedRandomFloat( "shotgunpax", -2, -1 ), SharedRandomFloat( "shotgunpay", -2, 2 ), 0 );
 	pPlayer->ViewPunch( punch );
 
+#ifdef HL2SB
+#ifndef CLIENT_DLL
+	CSoundEnt::InsertSound( SOUND_COMBAT, GetAbsOrigin(), SOUNDENT_VOLUME_SHOTGUN, 0.2, GetOwner() );
+#endif
+#endif
+
 	if (!m_iClip1 && pPlayer->GetAmmoCount(m_iPrimaryAmmoType) <= 0)
 	{
 		// HEV suit - indicate out of ammo condition
@@ -334,6 +401,12 @@ void CWeaponShotgun::PrimaryAttack( void )
 	}
 
 	m_bNeedPump = true;
+
+#ifdef HL2SB
+#ifndef CLIENT_DLL
+	gamestats->Event_WeaponFired( pPlayer, false, GetClassname() );
+#endif
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -376,6 +449,14 @@ void CWeaponShotgun::SecondaryAttack( void )
 	pPlayer->FireBullets( info );
 	pPlayer->ViewPunch( QAngle(SharedRandomFloat( "shotgunsax", -5, 5 ),0,0) );
 
+#ifdef HL2SB
+#ifndef CLIENT_DLL
+	pPlayer->SetMuzzleFlashTime( gpGlobals->curtime + 1.0 );
+
+	CSoundEnt::InsertSound( SOUND_COMBAT, GetAbsOrigin(), SOUNDENT_VOLUME_SHOTGUN, 0.2 );
+#endif
+#endif
+
 	if (!m_iClip1 && pPlayer->GetAmmoCount(m_iPrimaryAmmoType) <= 0)
 	{
 		// HEV suit - indicate out of ammo condition
@@ -383,6 +464,12 @@ void CWeaponShotgun::SecondaryAttack( void )
 	}
 
 	m_bNeedPump = true;
+
+#ifdef HL2SB
+#ifndef CLIENT_DLL
+	gamestats->Event_WeaponFired( pPlayer, true, GetClassname() );
+#endif
+#endif
 }
 
 //-----------------------------------------------------------------------------

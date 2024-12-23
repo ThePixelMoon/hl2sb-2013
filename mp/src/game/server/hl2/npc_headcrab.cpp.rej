@@ -1,0 +1,25 @@
+diff a/mp/src/game/server/hl2/npc_headcrab.cpp b/mp/src/game/server/hl2/npc_headcrab.cpp	(rejected hunks)
+@@ -1304,7 +1308,11 @@ void CBaseHeadcrab::JumpFromCanister()
+ 
+ void CBaseHeadcrab::DropFromCeiling( void )
+ {
++#ifndef HL2SB
+ 	if ( HL2GameRules()->IsAlyxInDarknessMode() )
++#else
++	if ( HL2MPRules()->IsAlyxInDarknessMode() )
++#endif
+ 	{
+ 		if ( IsHangingFromCeiling() )
+ 		{
+@@ -1879,7 +1891,11 @@ int CBaseHeadcrab::SelectSchedule( void )
+ 
+ 	if ( IsHangingFromCeiling() )
+ 	{
++#ifndef HL2SB
+ 		if ( HL2GameRules()->IsAlyxInDarknessMode() == false && ( HasCondition( COND_CAN_RANGE_ATTACK1 ) || HasCondition( COND_NEW_ENEMY ) ) )
++#else
++		if ( HL2MPRules()->IsAlyxInDarknessMode() == false && ( HasCondition( COND_CAN_RANGE_ATTACK1 ) || HasCondition( COND_NEW_ENEMY ) ) )
++#endif
+ 			return SCHED_HEADCRAB_CEILING_DROP;
+ 
+ 		if ( HasCondition( COND_LIGHT_DAMAGE ) || HasCondition( COND_HEAVY_DAMAGE ) )

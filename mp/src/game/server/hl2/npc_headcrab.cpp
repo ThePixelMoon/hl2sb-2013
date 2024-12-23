@@ -30,7 +30,11 @@
 #include "world.h"
 #include "npc_bullseye.h"
 #include "physics_npc_solver.h"
+#ifndef HL2SB
 #include "hl2_gamerules.h"
+#else
+#include "hl2mp_gamerules.h"
+#endif
 #include "decals.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -1321,7 +1325,11 @@ void CBaseHeadcrab::DropFromCeiling( void )
 				{
 					SetSchedule( SCHED_HEADCRAB_CEILING_DROP );
 
-					CBaseEntity *pPlayer = AI_GetSinglePlayer();
+#ifdef HL2SB
+					CBasePlayer *pPlayer = AI_GetNearestPlayer( GetAbsOrigin() );
+#else
+					CBasePlayer *pPlayer = AI_GetSinglePlayer();
+#endif
 
 					if ( pPlayer )
 					{
@@ -2065,7 +2073,11 @@ void CBaseHeadcrab::Ignite( float flFlameLifetime, bool bNPCOnly, float flSize, 
 	if( !bWasOnFire )
 	{
 #ifdef HL2_EPISODIC
+#ifndef HL2SB
 		if ( HL2GameRules()->IsAlyxInDarknessMode() == true )
+#else
+		if ( HL2MPRules()->IsAlyxInDarknessMode() == true )
+#endif
 		{
 			GetEffectEntity()->AddEffects( EF_DIMLIGHT );
 		}

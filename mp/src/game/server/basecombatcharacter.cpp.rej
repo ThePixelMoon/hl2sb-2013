@@ -1,0 +1,25 @@
+diff a/mp/src/game/server/basecombatcharacter.cpp b/mp/src/game/server/basecombatcharacter.cpp	(rejected hunks)
+@@ -1489,7 +1497,11 @@ bool CBaseCombatCharacter::BecomeRagdoll( const CTakeDamageInfo &info, const Vec
+ 
+ #ifdef HL2_DLL	
+ 	// Mega physgun requires everything to be a server-side ragdoll
++#ifndef HL2SB
+ 	if ( m_bForceServerRagdoll == true || ( HL2GameRules()->MegaPhyscannonActive() == true ) && !IsPlayer() && Classify() != CLASS_PLAYER_ALLY_VITAL && Classify() != CLASS_PLAYER_ALLY )
++#else
++	if ( m_bForceServerRagdoll == true || ( HL2MPRules()->MegaPhyscannonActive() == true ) && !IsPlayer() && Classify() != CLASS_PLAYER_ALLY_VITAL && Classify() != CLASS_PLAYER_ALLY )
++#endif
+ 	{
+ 		if ( CanBecomeServerRagdoll() == false )
+ 			return false;
+@@ -2987,7 +2999,11 @@ void CBaseCombatCharacter::VPhysicsShadowCollision( int index, gamevcollisioneve
+ 	float flOtherAttackerTime = 0.0f;
+ 
+ #ifdef HL2_DLL
++#ifndef HL2SB
+ 	if ( HL2GameRules()->MegaPhyscannonActive() == true )
++#else
++	if ( HL2MPRules()->MegaPhyscannonActive() == true )
++#endif
+ 	{
+ 		flOtherAttackerTime = 1.0f;
+ 	}

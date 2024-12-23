@@ -278,7 +278,13 @@ static void __MsgFunc_VGUIMenu( bf_read &msg )
 //-----------------------------------------------------------------------------
 ClientModeShared::ClientModeShared()
 {
+#ifdef LUA_SDK
+	m_pScriptedViewport = NULL;
+#endif
 	m_pViewport = NULL;
+#ifdef LUA_SDK
+	m_pClientLuaPanel = NULL;
+#endif
 	m_pChatElement = NULL;
 	m_pWeaponSelection = NULL;
 	m_nRootSize[ 0 ] = m_nRootSize[ 1 ] = -1;
@@ -388,8 +394,16 @@ void ClientModeShared::InitViewport()
 
 void ClientModeShared::VGui_Shutdown()
 {
+#ifdef LUA_SDK
+	delete m_pScriptedViewport;
+	m_pScriptedViewport = NULL;
+#endif
 	delete m_pViewport;
 	m_pViewport = NULL;
+#ifdef LUA_SDK
+	delete m_pClientLuaPanel;
+	m_pClientLuaPanel = NULL;
+#endif
 }
 
 
@@ -508,16 +522,50 @@ void ClientModeShared::OverrideMouseInput( float *x, float *y )
 	}
 }
 
+#ifdef ARGG
+//-----------------------------------------------------------------------------
+// Purpose: Allow weapons to override mouse input to view angles (for orbiting)
+//-----------------------------------------------------------------------------
+// adnan
+// control the mouse input in the grav gun through this
+bool ClientModeShared::OverrideViewAngles( void )
+{
+	C_BaseCombatWeapon *pWeapon = GetActiveWeapon();
+	if ( pWeapon )
+	{
+		// adnan
+		return pWeapon->OverrideViewAngles();
+	}
+
+	return false;
+}
+// end adnan
+#endif
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
 bool ClientModeShared::ShouldDrawViewModel()
 {
+#ifdef LUA_SDK
+	BEGIN_LUA_CALL_HOOK( "ShouldDrawViewModel" );
+	END_LUA_CALL_HOOK( 0, 1 );
+
+	RETURN_LUA_BOOLEAN();
+#endif
+
 	return true;
 }
 
 bool ClientModeShared::ShouldDrawDetailObjects( )
 {
+#ifdef LUA_SDK
+	BEGIN_LUA_CALL_HOOK( "ShouldDrawDetailObjects" );
+	END_LUA_CALL_HOOK( 0, 1 );
+
+	RETURN_LUA_BOOLEAN();
+#endif
+
 	return true;
 }
 
@@ -547,6 +595,13 @@ HeadtrackMovementMode_t ClientModeShared::ShouldOverrideHeadtrackControl()
 //-----------------------------------------------------------------------------
 bool ClientModeShared::ShouldDrawCrosshair( void )
 {
+#ifdef LUA_SDK
+	BEGIN_LUA_CALL_HOOK( "ShouldDrawCrosshair" );
+	END_LUA_CALL_HOOK( 0, 1 );
+
+	RETURN_LUA_BOOLEAN();
+#endif
+
 	return true;
 }
 
@@ -555,6 +610,14 @@ bool ClientModeShared::ShouldDrawCrosshair( void )
 //-----------------------------------------------------------------------------
 bool ClientModeShared::ShouldDrawLocalPlayer( C_BasePlayer *pPlayer )
 {
+#ifdef LUA_SDK
+	BEGIN_LUA_CALL_HOOK( "ShouldDrawLocalPlayer" );
+		lua_pushplayer( L, pPlayer );
+	END_LUA_CALL_HOOK( 1, 1 );
+
+	RETURN_LUA_BOOLEAN();
+#endif
+
 	if ( ( pPlayer->index == render->GetViewEntity() ) && !C_BasePlayer::ShouldDrawLocalPlayer() )
 		return false;
 
@@ -567,6 +630,13 @@ bool ClientModeShared::ShouldDrawLocalPlayer( C_BasePlayer *pPlayer )
 //-----------------------------------------------------------------------------
 bool ClientModeShared::ShouldDrawFog( void )
 {
+#ifdef LUA_SDK
+	BEGIN_LUA_CALL_HOOK( "ShouldDrawFog" );
+	END_LUA_CALL_HOOK( 0, 1 );
+
+	RETURN_LUA_BOOLEAN();
+#endif
+
 	return true;
 }
 
@@ -575,6 +645,25 @@ bool ClientModeShared::ShouldDrawFog( void )
 //-----------------------------------------------------------------------------
 void ClientModeShared::AdjustEngineViewport( int& x, int& y, int& width, int& height )
 {
+#ifdef LUA_SDK
+	BEGIN_LUA_CALL_HOOK( "AdjustEngineViewport" );
+		lua_pushinteger( L, x );
+		lua_pushinteger( L, y );
+		lua_pushinteger( L, width );
+		lua_pushinteger( L, height );
+	END_LUA_CALL_HOOK( 4, 4 );
+
+	if ( lua_isnumber( L, -4 ) )
+		x = luaL_checkint( L, -4 );
+	if ( lua_isnumber( L, -3 ) )
+		y = luaL_checkint( L, -3 );
+	if ( lua_isnumber( L, -2 ) )
+		width = luaL_checkint( L, -2 );
+	if ( lua_isnumber( L, -1 ) )
+		height = luaL_checkint( L, -1 );
+
+	lua_pop( L, 4 );
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -650,6 +739,19 @@ void ClientModeShared::ProcessInput(bool bActive)
 //-----------------------------------------------------------------------------
 int	ClientModeShared::KeyInput( int down, ButtonCode_t keynum, const char *pszCurrentBinding )
 {
+#ifdef LUA_SDK
+	if ( g_bLuaInitialized )
+	{
+		BEGIN_LUA_CALL_HOOK( "KeyInput" );
+			lua_pushinteger( L, down );
+			lua_pushinteger( L, keynum );
+			lua_pushstring( L, pszCurrentBinding );
+		END_LUA_CALL_HOOK( 3, 1 );
+
+		RETURN_LUA_INTEGER();
+	}
+#endif
+
 	if ( engine->Con_IsVisible() )
 		return 1;
 	

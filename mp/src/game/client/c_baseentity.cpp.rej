@@ -1,0 +1,32 @@
+diff a/mp/src/game/client/c_baseentity.cpp b/mp/src/game/client/c_baseentity.cpp	(rejected hunks)
+@@ -40,6 +40,10 @@
+ #include "decals.h"
+ #include "cdll_bounded_cvars.h"
+ #include "inetchannelinfo.h"
++#ifdef LUA_SDK
++#include "luamanager.h"
++#include "mathlib/lvector.h"
++#endif
+ 
+ // memdbgon must be the last include file in a .cpp file!!!
+ #include "tier0/memdbgon.h"
+@@ -1629,7 +1672,9 @@ void C_BaseEntity::GetShadowRenderBounds( Vector &mins, Vector &maxs, ShadowType
+ //-----------------------------------------------------------------------------
+ const Vector& C_BaseEntity::GetAbsOrigin( void ) const
+ {
++#ifndef HL2SB
+ 	Assert( s_bAbsQueriesValid );
++#endif
+ 	const_cast<C_BaseEntity*>(this)->CalcAbsolutePosition();
+ 	return m_vecAbsOrigin;
+ }
+@@ -1641,7 +1686,9 @@ const Vector& C_BaseEntity::GetAbsOrigin( void ) const
+ //-----------------------------------------------------------------------------
+ const QAngle& C_BaseEntity::GetAbsAngles( void ) const
+ {
++#ifndef HL2SB
+ 	Assert( s_bAbsQueriesValid );
++#endif
+ 	const_cast<C_BaseEntity*>(this)->CalcAbsolutePosition();
+ 	return m_angAbsRotation;
+ }

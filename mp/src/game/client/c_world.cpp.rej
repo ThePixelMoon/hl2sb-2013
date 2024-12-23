@@ -1,0 +1,11 @@
+diff a/mp/src/game/client/c_world.cpp b/mp/src/game/client/c_world.cpp	(rejected hunks)
+@@ -13,6 +13,9 @@
+ #include "ivieweffects.h"
+ #include "shake.h"
+ #include "eventlist.h"
++#ifdef LUA_SDK
++#include "luamanager.h"
++#endif
+ // memdbgon must be the last include file in a .cpp file!!!
+ #include "tier0/memdbgon.h"
+ 

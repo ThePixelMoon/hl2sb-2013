@@ -849,6 +849,7 @@ CChoreoScene *C_SceneEntity::LoadScene( const char *filename )
 	delete[] pBuffer;
 	return pScene;
 }
+#endif
 
 
 //-----------------------------------------------------------------------------

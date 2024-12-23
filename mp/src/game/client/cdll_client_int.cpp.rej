@@ -1,0 +1,102 @@
+diff a/mp/src/game/client/cdll_client_int.cpp b/mp/src/game/client/cdll_client_int.cpp	(rejected hunks)
+@@ -94,6 +94,23 @@
+ #include "matsys_controls/matsyscontrols.h"
+ #include "GameStats.h"
+ 
++#ifdef LUA_SDK
++#include "luamanager.h"
++#include "luacachefile.h"
++#include "mountaddons.h"
++#endif
++
++#ifdef HL2SB
++#include "mountsteamcontent.h"
++#ifdef _WIN32
++// HACKHACK: this is dumb, and unsafe. Things that should be uninitialized at the
++// engine-level can kiss their deconstructors goodbye. See Shutdown for an
++// explanation.
++DLL_IMPORT BOOL STDCALL TerminateProcess(HANDLE hProcess, unsigned int uExitCode);
++DLL_IMPORT HANDLE STDCALL GetCurrentProcess(void);
++#endif
++#endif
++
+ #ifdef PORTAL
+ #include "PortalRender.h"
+ #endif
+@@ -132,6 +149,7 @@ ISceneFileCache *scenefilecache = NULL;
+ IXboxSystem *xboxsystem = NULL;	// Xbox 360 only
+ IMatchmaking *matchmaking = NULL;
+ IAvi *avi = NULL;
++IBik *bik = NULL;
+ IUploadGameStats *gamestatsuploader = NULL;
+ 
+ 
+@@ -737,6 +781,8 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
+ 		return false;
+ 	if ( IsPC() && (avi = (IAvi *)appSystemFactory(AVI_INTERFACE_VERSION, NULL)) == NULL )
+ 		return false;
++	if ( (bik = (IBik *)appSystemFactory(BIK_INTERFACE_VERSION, NULL)) == NULL )
++		return false;
+ 	if ( (scenefilecache = (ISceneFileCache *)appSystemFactory( SCENE_FILE_CACHE_INTERFACE_VERSION, NULL )) == NULL )
+ 		return false;
+ 	if ( IsX360() && (xboxsystem = (IXboxSystem *)appSystemFactory( XBOXSYSTEM_INTERFACE_VERSION, NULL )) == NULL )
+@@ -764,6 +810,14 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
+ 	//Tony; mount an extra appId if it exists.
+ 	MountAdditionalContent();
+ 
++#if defined ( HL2SB )
++	//Andrew; then mount everything the user wants to use.
++	MountUserContent();
++
++	// Finally, load all of the player's addons.
++	MountAddons();
++#endif
++
+ 	if ( CommandLine()->FindParm( "-textmode" ) )
+ 		g_bTextMode = true;
+ 
+@@ -878,11 +939,21 @@ void CHLClient::PostInit()
+ 	IGameSystem::PostInitAllSystems();
+ }
+ 
++// This is called when a new game is started. (restart, map)
++bool CHLClient::GameInit( void )
++{
++	return true;
++}
++
+ //-----------------------------------------------------------------------------
+ // Purpose: Called when the client .dll is being dismissed
+ //-----------------------------------------------------------------------------
+ void CHLClient::Shutdown( void )
+ {
++#if defined ( LUA_SDK )
++	luasrc_shutdown_gameui();
++#endif
++
+ 	C_BaseAnimating::ShutdownBoneSetupThreadPool();
+ 	ClientWorldFactoryShutdown();
+ 
+@@ -911,6 +982,11 @@ void CHLClient::Shutdown( void )
+ 	
+ 	ClearKeyValuesCache();
+ 
++#if defined( HL2SB )
++	//Andrew; fixes the "CNet Encrypt:0" issue in 2007-based mods.
++	SteamAPI_Shutdown();
++#endif
++
+ 	DisconnectTier3Libraries( );
+ 	DisconnectTier2Libraries( );
+ 	ConVar_Unregister();
+@@ -1348,6 +1477,10 @@ void CHLClient::LevelShutdown( void )
+ 
+ 	// string tables are cleared on disconnect from a server, so reset our global pointers to NULL
+ 	ResetStringTablePointers();
++
++#ifdef LUA_SDK
++	luasrc_shutdown();
++#endif
+ }
+ 
+ 

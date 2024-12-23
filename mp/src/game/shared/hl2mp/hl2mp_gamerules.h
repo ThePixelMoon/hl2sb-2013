@@ -84,6 +84,14 @@ class CHL2MPRules : public CTeamplayRules
 public:
 	DECLARE_CLASS( CHL2MPRules, CTeamplayRules );
 
+#ifdef HL2SB
+private:
+	// Rules change for the mega physgun
+	CNetworkVar( bool, m_bMegaPhysgun );
+
+public:
+#endif
+
 #ifdef CLIENT_DLL
 
 	DECLARE_CLIENTCLASS_NOBASE(); // This makes datatables able to access our private vars.
@@ -108,6 +116,13 @@ public:
 	virtual void CreateStandardEntities( void );
 	virtual void ClientSettingsChanged( CBasePlayer *pPlayer );
 	virtual int PlayerRelationship( CBaseEntity *pPlayer, CBaseEntity *pTarget );
+#ifdef LUA_SDK
+#ifndef CLIENT_DLL
+	virtual bool PlayerCanHearChat( CBasePlayer *pListener, CBasePlayer *pSpeaker );
+	virtual bool ClientConnected( edict_t *pEntity, const char *pszName, const char *pszAddress, char *reject, int maxrejectlen );
+	virtual void InitHUD( CBasePlayer *pl );
+#endif
+#endif
 	virtual void GoToIntermission( void );
 	virtual void DeathNotice( CBasePlayer *pVictim, const CTakeDamageInfo &info );
 	virtual const char *GetGameDescription( void );
@@ -125,6 +140,10 @@ public:
 	virtual Vector VecItemRespawnSpot( CItem *pItem );
 	virtual QAngle VecItemRespawnAngles( CItem *pItem );
 	virtual float	FlItemRespawnTime( CItem *pItem );
+#ifdef LUA_SDK
+	virtual void PlayerGotItem( CBasePlayer *pPlayer, CItem *pItem );
+	virtual int ItemShouldRespawn( CItem *pItem );
+#endif
 	virtual bool	CanHavePlayerItem( CBasePlayer *pPlayer, CBaseCombatWeapon *pItem );
 	virtual bool FShouldSwitchWeapon( CBasePlayer *pPlayer, CBaseCombatWeapon *pWeapon );
 
@@ -134,8 +153,17 @@ public:
 	void    CheckChatForReadySignal( CHL2MP_Player *pPlayer, const char *chatmsg );
 	const char *GetChatFormat( bool bTeamOnly, CBasePlayer *pPlayer );
 
+#ifdef HL2SB
+	virtual void InitDefaultAIRelationships( void );
+#endif
 #endif
 	virtual void ClientDisconnected( edict_t *pClient );
+
+#ifdef LUA_SDK
+#ifndef CLIENT_DLL
+	virtual float FlPlayerFallDamage( CBasePlayer *pPlayer );
+#endif
+#endif
 
 	bool CheckGameOver( void );
 	bool IsIntermission( void );

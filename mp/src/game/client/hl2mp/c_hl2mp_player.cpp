@@ -130,8 +130,13 @@ void C_HL2MP_Player::TraceAttack( const CTakeDamageInfo &info, const Vector &vec
 
 		if ( blood != DONT_BLEED )
 		{
+#if defined ( LUA_SDK )
+			SpawnBlood( vecOrigin, lvecDir, blood, flDistance );// a little surface blood.
+			TraceBleed( flDistance, lvecDir, ptr, lInfo.GetDamageType() );
+#else
 			SpawnBlood( vecOrigin, vecDir, blood, flDistance );// a little surface blood.
 			TraceBleed( flDistance, vecDir, ptr, info.GetDamageType() );
+#endif
 		}
 	}
 }

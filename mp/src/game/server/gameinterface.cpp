@@ -1066,6 +1066,17 @@ bool CServerGameDLL::LevelInit( const char *pMapName, char const *pMapEntities, 
 	// clear any pending autosavedangerous
 	m_fAutoSaveDangerousTime = 0.0f;
 	m_fAutoSaveDangerousMinHealthToCommit = 0.0f;
+
+#if defined ( LUA_SDK )
+	BEGIN_LUA_CALL_HOOK( "LevelInit" );
+		lua_pushstring( L, pMapName );
+		lua_pushstring( L, pMapEntities );
+		lua_pushstring( L, pOldLevel );
+		lua_pushstring( L, pLandmarkName );
+		lua_pushboolean( L, loadGame );
+		lua_pushboolean( L, background );
+	END_LUA_CALL_HOOK( 6, 0 );
+#endif
 	return true;
 }
 
@@ -1341,7 +1352,11 @@ void CServerGameDLL::Think( bool finalTick )
 	if ( m_fAutoSaveDangerousTime != 0.0f && m_fAutoSaveDangerousTime < gpGlobals->curtime )
 	{
 		// The safety timer for a dangerous auto save has expired
+#ifdef HL2SB
+		CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
+#else
 		CBasePlayer *pPlayer = UTIL_PlayerByIndex( 1 );
+#endif
 
 		if ( pPlayer && ( pPlayer->GetDeathTime() == 0.0f || pPlayer->GetDeathTime() > gpGlobals->curtime )
 			&& !pPlayer->IsSinglePlayerGameEnding()
@@ -1827,6 +1842,16 @@ void CServerGameDLL::PreSaveGameLoaded( char const *pSaveName, bool bInGame )
 //-----------------------------------------------------------------------------
 bool CServerGameDLL::ShouldHideServer( void )
 {
+#if defined ( LUA_SDK )
+	if ( g_bLuaInitialized )
+	{
+		BEGIN_LUA_CALL_HOOK( "ShouldHideServer" );
+		END_LUA_CALL_HOOK( 0, 1 );
+
+		RETURN_LUA_BOOLEAN();
+	}
+#endif
+
 	if ( g_pcv_commentary && g_pcv_commentary->GetBool() )
 		return true;
 

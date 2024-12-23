@@ -967,6 +967,10 @@ C_BaseEntity::C_BaseEntity() :
 #endif
 
 	ParticleProp()->Init( this );
+
+#if defined( LUA_SDK )
+	m_nTableReference = LUA_NOREF;
+#endif
 }
 
 
@@ -984,6 +988,9 @@ C_BaseEntity::~C_BaseEntity()
 #endif
 	RemoveFromInterpolationList();
 	RemoveFromTeleportList();
+#if defined( LUA_SDK )
+	lua_unref( L, m_nTableReference );
+#endif
 }
 
 void C_BaseEntity::Clear( void )
@@ -1627,11 +1634,43 @@ int C_BaseEntity::GetSoundSourceIndex() const
 //-----------------------------------------------------------------------------
 const Vector& C_BaseEntity::GetRenderOrigin( void )
 {
+#ifdef LUA_SDK
+	if ( m_nTableReference != LUA_NOREF )
+	{
+		lua_getref( L, m_nTableReference );
+		lua_getfield( L, -1, "m_vecRenderOrigin" );
+		lua_remove( L, -2 );
+		if ( lua_isuserdata( L, -1 ) && luaL_checkudata( L, -1, "Vector" ) )
+		{
+			const Vector& res = luaL_checkvector( L, -1 );
+			lua_pop( L, 1 );
+			return res;
+		}
+		lua_pop( L, 1 );
+	}
+#endif
+
 	return GetAbsOrigin();
 }
 
 const QAngle& C_BaseEntity::GetRenderAngles( void )
 {
+#ifdef LUA_SDK
+	if ( m_nTableReference != LUA_NOREF )
+	{
+		lua_getref( L, m_nTableReference );
+		lua_getfield( L, -1, "m_angRenderAngles" );
+		lua_remove( L, -2 );
+		if ( lua_isuserdata( L, -1 ) && luaL_checkudata( L, -1, "QAngle" ) )
+		{
+			const QAngle& res = luaL_checkangle( L, -1 );
+			lua_pop( L, 1 );
+			return res;
+		}
+		lua_pop( L, 1 );
+	}
+#endif
+
 	return GetAbsAngles();
 }
 
@@ -4764,6 +4803,13 @@ const char *C_BaseEntity::GetClassname( void )
 	static char outstr[ 256 ];
 	outstr[ 0 ] = 0;
 	bool gotname = false;
+#if defined ( LUA_SDK )
+	if ( m_iClassname && m_iClassname[ 0 ] )
+	{
+		Q_snprintf( outstr, sizeof( outstr ), "%s", m_iClassname );
+		gotname = true;
+	}
+#endif
 #ifndef NO_ENTITY_PREDICTION
 	if ( GetPredDescMap() )
 	{
@@ -5899,14 +5945,11 @@ float C_BaseEntity::GetInterpolationAmount( int flags )
 		return TICK_INTERVAL * serverTickMultiple;
 	}
 
-	// Always fully interpolate during multi-player or during demo playback, if the recorded
-	// demo was recorded locally.
-	const bool bPlayingDemo = engine->IsPlayingDemo();
-	const bool bPlayingMultiplayer = !bPlayingDemo && ( gpGlobals->maxClients > 1 );
-	const bool bPlayingNonLocallyRecordedDemo = bPlayingDemo && !engine->IsPlayingDemoALocallyRecordedDemo();
-	if ( bPlayingMultiplayer || bPlayingNonLocallyRecordedDemo )
+	// Always fully interpolate during multi-player or during demo playback...
+	if ( ( gpGlobals->maxClients > 1 ) || 
+		engine->IsPlayingDemo() )
 	{
-		return AdjustInterpolationAmount( this, TICKS_TO_TIME( TIME_TO_TICKS( GetClientInterpAmount() ) + serverTickMultiple ) );
+		return AdjustInterpolationAmount( this, TICKS_TO_TIME ( TIME_TO_TICKS( GetClientInterpAmount() ) + serverTickMultiple ) );
 	}
 
 	int expandedServerTickMultiple = serverTickMultiple;
@@ -5929,7 +5972,7 @@ float C_BaseEntity::GetInterpolationAmount( int flags )
 		return TICK_INTERVAL * expandedServerTickMultiple;
 	}
 
-	return AdjustInterpolationAmount( this, TICKS_TO_TIME( TIME_TO_TICKS( GetClientInterpAmount() ) + serverTickMultiple ) );
+	return AdjustInterpolationAmount( this, TICK_INTERVAL * ( TIME_TO_TICKS( GetClientInterpAmount() ) +  serverTickMultiple ) );
 }
 
 

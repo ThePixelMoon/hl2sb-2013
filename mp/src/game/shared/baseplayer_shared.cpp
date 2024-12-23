@@ -1274,6 +1274,12 @@ CBaseEntity *CBasePlayer::FindUseEntity()
 //-----------------------------------------------------------------------------
 void CBasePlayer::PlayerUse ( void )
 {
+#if defined ( LUA_SDK )
+	BEGIN_LUA_CALL_HOOK( "PlayerUse" );
+		lua_pushplayer( L, this );
+	END_LUA_CALL_HOOK( 1, 0 );
+#endif
+
 #ifdef GAME_DLL
 	// Was use pressed or released?
 	if ( ! ((m_nButtons | m_afButtonPressed | m_afButtonReleased) & IN_USE) )
@@ -1638,6 +1644,24 @@ void CBasePlayer::CalcPlayerView( Vector& eyeOrigin, QAngle& eyeAngles, float& f
 
 	// calc current FOV
 	fov = GetFOV();
+
+#if defined( LUA_SDK )
+	BEGIN_LUA_CALL_HOOK( "CalcPlayerView" );
+		lua_pushplayer( L, this );
+		lua_pushvector( L, eyeOrigin );
+		lua_pushangle( L, eyeAngles );
+		lua_pushnumber( L, fov );
+	END_LUA_CALL_HOOK( 4, 3 );
+
+	if ( lua_isuserdata( L, -3 ) && luaL_checkudata( L, -3, "Vector" ) )
+		VectorCopy( luaL_checkvector( L, -3 ), eyeOrigin );
+	if ( lua_isuserdata( L, -2 ) && luaL_checkudata( L, -2, "QAngle" ) )
+		VectorCopy( luaL_checkangle( L, -2 ), eyeAngles );
+	if ( lua_isnumber( L, -1 ) )
+		fov = luaL_checknumber( L, -1 );
+
+	lua_pop( L, 3 );
+#endif
 }
 
 //-----------------------------------------------------------------------------
