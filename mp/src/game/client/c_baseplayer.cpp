@@ -57,6 +57,10 @@
 // NVNT haptics system interface
 #include "haptics/ihaptics.h"
 
+#ifdef LUA_SDK
+#include "luamanager.h"
+#endif
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -294,6 +298,13 @@ END_RECV_TABLE()
 
 		RecvPropFloat	(RECVINFO(m_flMaxspeed)),
 		RecvPropInt		(RECVINFO(m_fFlags)),
+
+#ifdef ARGG
+		// adnan
+		// get the use angles
+		RecvPropVector		( RECVINFO( m_vecUseAngles ) ),
+		// end adnan
+#endif
 
 
 		RecvPropInt		(RECVINFO(m_iObserverMode), 0, RecvProxy_ObserverMode ),
