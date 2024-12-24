@@ -170,7 +170,16 @@ extern vgui::IInputInternal *g_InputInternal;
 #include "sixense/in_sixense.h"
 #endif
 
-// memdbgon must be the last include file in a .cpp file!!!
+#ifdef LUA_SDK
+#include "luamanager.h"
+#include "luacachefile.h"
+#include "mountaddons.h"
+#endif
+
+#ifdef HL2SB
+#include "mountsteamcontent.h"
+#endif
+
 #include "tier0/memdbgon.h"
 
 extern IClientMode *GetClientModeNormal();
@@ -991,6 +1000,14 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 		return false;
 	}
 
+#if defined ( HL2SB )
+	//Andrew; then mount everything the user wants to use.
+	MountUserContent();
+
+	// Finally, load all of the player's addons.
+	MountAddons();
+#endif
+
 	if ( CommandLine()->FindParm( "-textmode" ) )
 		g_bTextMode = true;
 
@@ -1191,11 +1208,21 @@ void CHLClient::PostInit()
 #endif
 }
 
+// This is called when a new game is started. (restart, map)
+bool CHLClient::GameInit( void )
+{
+	return true;
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: Called when the client .dll is being dismissed
 //-----------------------------------------------------------------------------
 void CHLClient::Shutdown( void )
 {
+#if defined ( LUA_SDK )
+	luasrc_shutdown_gameui();
+#endif
+
     if (g_pAchievementsAndStatsInterface)
     {
         g_pAchievementsAndStatsInterface->ReleasePanel();
@@ -1258,6 +1285,10 @@ void CHLClient::Shutdown( void )
 #if defined( WIN32 ) && !defined( _X360 )
 	// NVNT Disconnect haptics system
 	DisconnectHaptics();
+#endif
+
+#ifdef LUA_SDK
+	luasrc_shutdown();
 #endif
 }
 
