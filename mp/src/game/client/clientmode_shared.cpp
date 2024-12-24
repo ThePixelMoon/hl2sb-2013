@@ -65,6 +65,12 @@ extern ConVar replay_rendersetting_renderglow;
 #include "econ_item_description.h"
 #endif
 
+#if defined( LUA_SDK )
+#include "luamanager.h"
+#include "lbaseentity_shared.h"
+#include "lbaseplayer_shared.h"
+#endif
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -301,7 +307,13 @@ ClientModeShared::ClientModeShared()
 //-----------------------------------------------------------------------------
 ClientModeShared::~ClientModeShared()
 {
+#ifdef LUA_SDK
+	delete m_pScriptedViewport; 
+#endif
 	delete m_pViewport; 
+#ifdef LUA_SDK
+	delete m_pClientLuaPanel; 
+#endif
 }
 
 void ClientModeShared::ReloadScheme( bool flushLowLevel )
@@ -493,6 +505,14 @@ void ClientModeShared::OverrideView( CViewSetup *pSetup )
 //-----------------------------------------------------------------------------
 bool ClientModeShared::ShouldDrawEntity(C_BaseEntity *pEnt)
 {
+#ifdef LUA_SDK
+	BEGIN_LUA_CALL_HOOK( "ShouldDrawEntity" );
+		lua_pushentity( L, pEnt );
+	END_LUA_CALL_HOOK( 1, 1 );
+
+	RETURN_LUA_BOOLEAN();
+#endif
+
 	return true;
 }
 
@@ -501,6 +521,13 @@ bool ClientModeShared::ShouldDrawEntity(C_BaseEntity *pEnt)
 //-----------------------------------------------------------------------------
 bool ClientModeShared::ShouldDrawParticles( )
 {
+#ifdef LUA_SDK
+	BEGIN_LUA_CALL_HOOK( "ShouldDrawParticles" );
+	END_LUA_CALL_HOOK( 0, 1 );
+
+	RETURN_LUA_BOOLEAN();
+#endif
+
 #ifdef TF_CLIENT_DLL
 	C_TFPlayer *pTFPlayer = C_TFPlayer::GetLocalTFPlayer();
 	if ( pTFPlayer && !pTFPlayer->ShouldPlayerDrawParticles() )
@@ -693,6 +720,13 @@ void ClientModeShared::Update()
 {
 #if defined( REPLAY_ENABLED )
 	UpdateReplayMessages();
+#endif
+
+#if defined( LUA_SDK )
+	if ( m_pScriptedViewport->IsVisible() != cl_drawhud.GetBool() )
+	{
+		m_pScriptedViewport->SetVisible( cl_drawhud.GetBool() );
+	}
 #endif
 
 	if ( m_pViewport->IsVisible() != cl_drawhud.GetBool() )
@@ -986,21 +1020,57 @@ void ClientModeShared::Enable()
 	// Add our viewport to the root panel.
 	if( pRoot != 0 )
 	{
+#ifdef LUA_SDK
+		m_pScriptedViewport->SetParent( pRoot );
+#endif
 		m_pViewport->SetParent( pRoot );
+#ifdef LUA_SDK
+		m_pClientLuaPanel->SetParent( pRoot );
+#endif
 	}
 
 	// All hud elements should be proportional
 	// This sets that flag on the viewport and all child panels
+#ifdef LUA_SDK
+	m_pScriptedViewport->SetProportional( true );
+#endif
 	m_pViewport->SetProportional( true );
+#ifdef LUA_SDK
+	m_pClientLuaPanel->SetProportional( false );
+#endif
 
+#ifdef LUA_SDK
+	m_pScriptedViewport->SetCursor( m_CursorNone );
+#endif
 	m_pViewport->SetCursor( m_CursorNone );
+#ifdef LUA_SDK
+	m_pClientLuaPanel->SetCursor( m_CursorNone );
+#endif
 	vgui::surface()->SetCursor( m_CursorNone );
 
+#ifdef LUA_SDK
+	m_pScriptedViewport->SetVisible( true );
+#endif
 	m_pViewport->SetVisible( true );
+#ifdef LUA_SDK
+	m_pClientLuaPanel->SetVisible( true );
+#endif
+#ifdef LUA_SDK
+	if ( m_pScriptedViewport->IsKeyBoardInputEnabled() )
+	{
+		m_pScriptedViewport->RequestFocus();
+	}
+#endif
 	if ( m_pViewport->IsKeyBoardInputEnabled() )
 	{
 		m_pViewport->RequestFocus();
 	}
+#ifdef LUA_SDK
+	if ( m_pClientLuaPanel->IsKeyBoardInputEnabled() )
+	{
+		m_pClientLuaPanel->RequestFocus();
+	}
+#endif
 
 	Layout();
 }
@@ -1013,10 +1083,22 @@ void ClientModeShared::Disable()
 	// Remove our viewport from the root panel.
 	if( pRoot != 0 )
 	{
+#ifdef LUA_SDK
+		m_pScriptedViewport->SetParent( (vgui::VPANEL)NULL );
+#endif
 		m_pViewport->SetParent( (vgui::VPANEL)NULL );
+#ifdef LUA_SDK
+		m_pClientLuaPanel->SetParent( (vgui::VPANEL)NULL );
+#endif
 	}
 
+#ifdef LUA_SDK
+	m_pScriptedViewport->SetVisible( false );
+#endif
 	m_pViewport->SetVisible( false );
+#ifdef LUA_SDK
+	m_pClientLuaPanel->SetVisible( false );
+#endif
 }
 
 
@@ -1034,7 +1116,13 @@ void ClientModeShared::Layout()
 		m_nRootSize[ 0 ] = wide;
 		m_nRootSize[ 1 ] = tall;
 
+#ifdef LUA_SDK
+		m_pScriptedViewport->SetBounds(0, 0, wide, tall);
+#endif
 		m_pViewport->SetBounds(0, 0, wide, tall);
+#ifdef LUA_SDK
+		m_pClientLuaPanel->SetBounds(0, 0, wide, tall);
+#endif
 		if ( changed )
 		{
 			ReloadScheme(false);
@@ -1616,4 +1704,3 @@ void ClientModeShared::DeactivateInGameVGuiContext()
 {
 	vgui::ivgui()->ActivateContext( DEFAULT_VGUI_CONTEXT );
 }
-
