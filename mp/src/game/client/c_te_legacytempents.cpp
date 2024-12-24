@@ -35,6 +35,12 @@
 #include "c_te_effect_dispatch.h"
 #include "c_props.h"
 #include "c_basedoor.h"
+#ifdef LUA_SDK
+#include "weapon_hl2mpbase_scriptedweapon.h"
+#include "luamanager.h"
+#include "lbasecombatweapon_shared.h"
+#include "mathlib/lvector.h"
+#endif
 
 // NOTE: Always include this last!
 #include "tier0/memdbgon.h"
@@ -3459,4 +3465,3 @@ void CTempEnts::CSEjectBrass( const Vector &vecPosition, const QAngle &angVeloci
 
 	
 }
-
