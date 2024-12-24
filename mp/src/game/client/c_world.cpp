@@ -15,6 +15,9 @@
 #include "eventlist.h"
 // NVNT haptic include for notification of world precache
 #include "haptics/haptic_utils.h"
+#ifdef LUA_SDK
+#include "luamanager.h"
+#endif
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -197,4 +200,3 @@ C_World *GetClientWorldEntity()
 	Assert( g_pClientWorld != NULL );
 	return g_pClientWorld;
 }
-
