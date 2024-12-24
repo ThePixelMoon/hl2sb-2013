@@ -31,7 +31,8 @@ inline CBasePlayer *AI_GetSinglePlayer()
 	for( int iClient = 1; iClient <= gpGlobals->maxClients; ++iClient )
 	{
 		CBasePlayer *pEnt = UTIL_PlayerByIndex( iClient );
-		if(!pEnt || !pEnt->IsPlayer())
+		// if(!pEnt || !pEnt->IsPlayer())
+		if(!pEnt)
 			continue;
 
 		// Return the first player we can get a hold of.
