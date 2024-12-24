@@ -26,6 +26,13 @@
 
 #include "ilagcompensationmanager.h"
 
+#ifdef LUA_SDK
+#include "luamanager.h"
+#include "lbaseentity_shared.h"
+#include "lhl2mp_player_shared.h"
+#include "ltakedamageinfo.h"
+#endif
+
 int g_iLastCitizenModel = 0;
 int g_iLastCombineModel = 0;
 

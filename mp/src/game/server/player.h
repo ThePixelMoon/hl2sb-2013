@@ -1371,6 +1371,10 @@ inline bool CBasePlayer::IsFiringWeapon( void ) const
 
 
 
+#ifdef HL2SB
+extern CBaseEntity *FindPlayerStart(const char *pszClassName);
+#endif
+
 //-----------------------------------------------------------------------------
 // Converts an entity to a player
 //-----------------------------------------------------------------------------
