@@ -1004,8 +1004,10 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 	//Andrew; then mount everything the user wants to use.
 	MountUserContent();
 
+#if defined ( LUA_SDK )
 	// Finally, load all of the player's addons.
 	MountAddons();
+#endif
 #endif
 
 	if ( CommandLine()->FindParm( "-textmode" ) )
