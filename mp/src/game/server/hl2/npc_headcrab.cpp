@@ -1309,7 +1309,11 @@ void CBaseHeadcrab::JumpFromCanister()
 void CBaseHeadcrab::DropFromCeiling( void )
 {
 #ifdef HL2_EPISODIC
+#ifndef HL2SB
 	if ( HL2GameRules()->IsAlyxInDarknessMode() )
+#else
+	if ( HL2MPRules()->IsAlyxInDarknessMode() )
+#endif
 	{
 		if ( IsHangingFromCeiling() )
 		{
@@ -1891,7 +1895,11 @@ int CBaseHeadcrab::SelectSchedule( void )
 	{
 		bool bIsAlyxInDarknessMode = false;
 #ifdef HL2_EPISODIC
+#ifndef HL2SB
 		bIsAlyxInDarknessMode = HL2GameRules()->IsAlyxInDarknessMode();
+#else
+		bIsAlyxInDarknessMode = HL2MPRules()->IsAlyxInDarknessMode();
+#endif
 #endif // HL2_EPISODIC
 
 		if ( bIsAlyxInDarknessMode == false && ( HasCondition( COND_CAN_RANGE_ATTACK1 ) || HasCondition( COND_NEW_ENEMY ) ) )
