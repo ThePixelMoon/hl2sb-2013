@@ -954,7 +954,12 @@ int CNPC_BaseZombie::OnTakeDamage_Alive( const CTakeDamageInfo &inputInfo )
 void CNPC_BaseZombie::MakeAISpookySound( float volume, float duration )
 {
 #ifdef HL2_EPISODIC
+#ifndef HL2SB
 	if ( HL2GameRules()->IsAlyxInDarknessMode() )
+#else
+	if ( HL2MPRules()->IsAlyxInDarknessMode() )
+#endif
+
 	{
 		CSoundEnt::InsertSound( SOUND_COMBAT, EyePosition(), volume, duration, this, SOUNDENT_CHANNEL_SPOOKY_NOISE );
 	}
