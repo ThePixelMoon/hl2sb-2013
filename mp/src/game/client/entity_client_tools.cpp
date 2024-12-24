@@ -17,6 +17,11 @@
 	#include "PortalRender.h"
 #endif
 
+#ifdef LUA_SDK
+	#include "luamanager.h"
+	#include "lbaseentity_shared.h"
+#endif
+
 #pragma warning( disable: 4355 )  // warning C4355: 'this' : used in base member initializer list
 
 class CClientTools;
