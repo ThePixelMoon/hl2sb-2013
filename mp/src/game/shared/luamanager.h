@@ -11,6 +11,7 @@
 #pragma once
 #endif
 
+#ifdef LUA_SDK
 #include "lua.hpp"
 
 #define LUA_ROOT					"lua" // Can't be "LUA_PATH" because luaconf.h uses it.
@@ -338,4 +339,5 @@ void       luasrc_LoadWeapons (const char *path = 0);
 bool       luasrc_LoadGamemode (const char *gamemode);
 bool       luasrc_SetGamemode (const char *gamemode);
 
+#endif // LUA_SDK
 #endif // LUAMANAGER_H
