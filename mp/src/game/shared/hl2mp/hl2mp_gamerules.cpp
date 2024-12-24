@@ -392,6 +392,7 @@ bool CHL2MPRules::AllowDamage( CBaseEntity *pVictim, const CTakeDamageInfo &info
 
 	return BaseClass::AllowDamage( pVictim, lInfo );
 }
+#endif
 #ifdef HL2SB
 //-----------------------------------------------------------------------------
 // Purpose: Whether or not the NPC should drop a health vial
@@ -449,6 +450,7 @@ void CHL2MPRules::NPC_DroppedGrenade( void )
 }
 
 #endif
+#if defined ( LUA_SDK )
 
 void CHL2MPRules::PlayerThink( CBasePlayer *pPlayer )
 {
