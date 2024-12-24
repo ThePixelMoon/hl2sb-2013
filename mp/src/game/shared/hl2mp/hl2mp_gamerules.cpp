@@ -1275,12 +1275,65 @@ int CHL2MPRules::PlayerRelationship( CBaseEntity *pPlayer, CBaseEntity *pTarget 
 	return GR_NOTTEAMMATE;
 }
 
+#ifndef CLIENT_DLL
+#if defined ( LUA_SDK )
+bool CHL2MPRules::PlayerCanHearChat( CBasePlayer *pListener, CBasePlayer *pSpeaker )
+{
+	BEGIN_LUA_CALL_HOOK( "PlayerCanHearChat" );
+		lua_pushplayer( L, pListener );
+		lua_pushplayer( L, pSpeaker );
+	END_LUA_CALL_HOOK( 2, 1 );
+
+	RETURN_LUA_BOOLEAN();
+
+	return BaseClass::PlayerCanHearChat( pListener, pSpeaker );
+}
+
+bool CHL2MPRules::ClientConnected( edict_t *pEntity, const char *pszName, const char *pszAddress, char *reject, int maxrejectlen )
+{
+	BEGIN_LUA_CALL_HOOK( "ClientConnected" );
+		lua_pushplayer( L, (CBasePlayer *)CBaseEntity::Instance( pEntity ) );
+		lua_pushstring( L, pszName );
+		lua_pushstring( L, pszAddress );
+		lua_pushstring( L, reject );
+		lua_pushinteger( L, maxrejectlen );
+	END_LUA_CALL_HOOK( 5, 1 );
+
+	RETURN_LUA_BOOLEAN();
+
+	return BaseClass::ClientConnected( pEntity, pszName, pszAddress, reject, maxrejectlen );
+}
+
+void CHL2MPRules::InitHUD( CBasePlayer *pPlayer )
+{
+	BEGIN_LUA_CALL_HOOK( "InitHUD" );
+		lua_pushplayer( L, pPlayer );
+	END_LUA_CALL_HOOK( 1, 0 );
+
+	BaseClass::InitHUD( pPlayer );
+}
+
+
+#endif
+#endif
+
 const char *CHL2MPRules::GetGameDescription( void )
 { 
+#if !defined ( LUA_SDK )
 	if ( IsTeamplay() )
 		return "Team Deathmatch"; 
+#else
+	BEGIN_LUA_CALL_HOOK( "GetGameDescription" );
+	END_LUA_CALL_HOOK( 0, 1 );
 
+	RETURN_LUA_STRING();
+#endif
+
+#if !defined( HL2SB )
 	return "Deathmatch"; 
+#else
+	return "Half-Life 2 Sandbox";
+#endif
 } 
 
 bool CHL2MPRules::IsConnectedUserInfoChangeAllowed( CBasePlayer *pPlayer )
@@ -1290,9 +1343,16 @@ bool CHL2MPRules::IsConnectedUserInfoChangeAllowed( CBasePlayer *pPlayer )
  
 float CHL2MPRules::GetMapRemainingTime()
 {
+#if !defined ( LUA_SDK )
 	// if timelimit is disabled, return 0
 	if ( mp_timelimit.GetInt() <= 0 )
 		return 0;
+#else
+	BEGIN_LUA_CALL_HOOK( "GetMapRemainingTime" );
+	END_LUA_CALL_HOOK( 0, 1 );
+
+	RETURN_LUA_NUMBER();
+#endif
 
 	// timelimit is in minutes
 
@@ -1558,6 +1618,11 @@ CAmmoDef *GetAmmoDef()
 
 void CHL2MPRules::RestartGame()
 {
+#if defined ( LUA_SDK )
+	BEGIN_LUA_CALL_HOOK( "RestartGame" );
+	END_LUA_CALL_HOOK( 0, 0 );
+#endif
+
 	// bounds check
 	if ( mp_timelimit.GetInt() < 0 )
 	{
