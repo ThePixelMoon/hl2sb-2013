@@ -1,4 +1,4 @@
-//========== Copyleft © 2011, Team Sandbox, Some rights reserved. ===========//
+//========== Copyleft ï¿½ 2011, Team Sandbox, Some rights reserved. ===========//
 //
 // Purpose:
 //
@@ -9,14 +9,15 @@
 #include "KeyValues.h"
 #include "mountsteamcontent.h"
 // Andrew; grab only what we need from Open Steamworks.
-#include "SteamTypes.h"
-#include "ISteam006.h"
+// #include "SteamTypes.h"
+// #include "ISteam006.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
 bool Steam_MountSteamContent( int nExtraAppId )
 {
+#if 0
 	CreateInterfaceFn CreateInterface = Sys_GetFactory( "Steam.dll" );
 	if( !CreateInterface )
 		return false;
@@ -88,6 +89,7 @@ bool Steam_MountSteamContent( int nExtraAppId )
 	delete[] App.szCurrentVersionLabel;
 	delete[] App.szInstallDirName;
 	delete[] App.szUnkString;
+#endif
 
 	return true;
 }
