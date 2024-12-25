@@ -37,7 +37,7 @@ static int gEntList_FindEntityByClassname (lua_State *L) {
 }
 
 static int gEntList_FindEntityByClassnameNearest (lua_State *L) {
-  lua_pushentity(L, gEntList.FindEntityByClassnameNearest(luaL_checkstring(L, 1), luaL_checkvector(L, 2), luaL_checknumber(L, 3), luaL_optint(L, 4, BRUSHPRECISION_NORMAL)));
+  lua_pushentity(L, gEntList.FindEntityByClassnameNearest(luaL_checkstring(L, 1), luaL_checkvector(L, 2), luaL_checknumber(L, 3)));
   return 1;
 }
 
@@ -57,12 +57,12 @@ static int gEntList_FindEntityByName (lua_State *L) {
 }
 
 static int gEntList_FindEntityByNameNearest (lua_State *L) {
-  lua_pushentity(L, gEntList.FindEntityByNameNearest(luaL_checkstring(L, 1), luaL_checkvector(L, 2), luaL_checknumber(L, 3), luaL_optentity(L, 4, 0), luaL_optentity(L, 5, 0), luaL_optentity(L, 6, 0), luaL_optint(L, 7, BRUSHPRECISION_NORMAL)));
+  lua_pushentity(L, gEntList.FindEntityByNameNearest(luaL_checkstring(L, 1), luaL_checkvector(L, 2), luaL_checknumber(L, 3), luaL_optentity(L, 4, 0), luaL_optentity(L, 5, 0), luaL_optentity(L, 6, 0)));
   return 1;
 }
 
 static int gEntList_FindEntityByNameWithin (lua_State *L) {
-  lua_pushentity(L, gEntList.FindEntityByNameWithin(lua_toentity(L, 1), luaL_checkstring(L, 2), luaL_checkvector(L, 3), luaL_checknumber(L, 4), luaL_optentity(L, 5, 0), luaL_optentity(L, 6, 0), luaL_optentity(L, 7, 0), luaL_optint(L, 7, BRUSHPRECISION_NORMAL)));
+  lua_pushentity(L, gEntList.FindEntityByNameWithin(lua_toentity(L, 1), luaL_checkstring(L, 2), luaL_checkvector(L, 3), luaL_checknumber(L, 4), luaL_optentity(L, 5, 0), luaL_optentity(L, 6, 0), luaL_optentity(L, 7, 0)));
   return 1;
 }
 
@@ -82,12 +82,12 @@ static int gEntList_FindEntityGeneric (lua_State *L) {
 }
 
 static int gEntList_FindEntityGenericNearest (lua_State *L) {
-  lua_pushentity(L, gEntList.FindEntityGenericNearest(luaL_checkstring(L, 1), luaL_checkvector(L, 2), luaL_checknumber(L, 3), luaL_optentity(L, 4, 0), luaL_optentity(L, 5, 0), luaL_optentity(L, 6, 0), luaL_optint(L, 7, BRUSHPRECISION_NORMAL)));
+  lua_pushentity(L, gEntList.FindEntityGenericNearest(luaL_checkstring(L, 1), luaL_checkvector(L, 2), luaL_checknumber(L, 3), luaL_optentity(L, 4, 0), luaL_optentity(L, 5, 0), luaL_optentity(L, 6, 0)));
   return 1;
 }
 
 static int gEntList_FindEntityGenericWithin (lua_State *L) {
-  lua_pushentity(L, gEntList.FindEntityGenericWithin(lua_toentity(L, 1), luaL_checkstring(L, 2), luaL_checkvector(L, 3), luaL_checknumber(L, 4), luaL_optentity(L, 5, 0), luaL_optentity(L, 6, 0), luaL_optentity(L, 7, 0), luaL_optint(L, 8, BRUSHPRECISION_NORMAL)));
+  lua_pushentity(L, gEntList.FindEntityGenericWithin(lua_toentity(L, 1), luaL_checkstring(L, 2), luaL_checkvector(L, 3), luaL_checknumber(L, 4), luaL_optentity(L, 5, 0), luaL_optentity(L, 6, 0), luaL_optentity(L, 7, 0)));
   return 1;
 }
 
