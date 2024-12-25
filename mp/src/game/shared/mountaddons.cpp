@@ -1,4 +1,4 @@
-//========== Copyleft © 2011, Team Sandbox, Some rights reserved. ===========//
+//========== Copyleft ï¿½ 2011, Team Sandbox, Some rights reserved. ===========//
 //
 // Purpose:
 //
@@ -11,6 +11,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+#ifdef LUA_SDK
 void MountAddons()
 {
 	// Andrew; mount the Lua cache directory first. We consider this a temporary
@@ -71,3 +72,4 @@ void MountAddons()
 	}
 	g_pFullFileSystem->FindClose( fh );
 }
+#endif

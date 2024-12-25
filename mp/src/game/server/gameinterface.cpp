@@ -649,12 +649,14 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 	if ( !soundemitterbase->Connect( appSystemFactory ) )
 		return false;
 
-#if defined ( HL2SB )
+#ifdef HL2SB
 	//Andrew; then mount everything the user wants to use.
 	MountUserContent();
 
+#ifdef LUA_SDK
 	// Finally, load all of the player's addons.
 	MountAddons();
+#endif
 
 	// Fixes the issue where the external ip is not matching the local ip.
 	PatchTicketValidation();

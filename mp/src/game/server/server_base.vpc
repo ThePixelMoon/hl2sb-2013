@@ -453,6 +453,8 @@ $Project
 		$File	"$SRCDIR\public\model_types.h"
 		$File	"modelentities.cpp"
 		$File	"$SRCDIR\game\shared\ModelSoundsCache.cpp"
+		$File	"$SRCDIR\game\shared\mountaddons.cpp"
+		$File	"$SRCDIR\game\shared\mountaddons.h"
 		$File	"movehelper_server.cpp"
 		$File	"movehelper_server.h"
 		$File	"movement.cpp"
