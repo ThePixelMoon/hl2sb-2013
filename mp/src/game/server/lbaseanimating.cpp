@@ -534,7 +534,7 @@ static const luaL_Reg CBaseAnimatingmeta[] = {
   {"SetCycle", CBaseAnimating_SetCycle},
   {"SetHitboxSet", CBaseAnimating_SetHitboxSet},
   {"SetHitboxSetByName", CBaseAnimating_SetHitboxSetByName},
-  {"SetModelWidthScale", CBaseAnimating_SetModelWidthScale},
+  //{"SetModelWidthScale", CBaseAnimating_SetModelWidthScale},
   {"SetPlaybackRate", CBaseAnimating_SetPlaybackRate},
   {"SetPoseParameter", CBaseAnimating_SetPoseParameter},
   {"SetSequence", CBaseAnimating_SetSequence},
