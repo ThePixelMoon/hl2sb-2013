@@ -130,6 +130,17 @@ extern ConVar tf_mm_servermode;
 #include "replay/ireplaysystem.h"
 #endif
 
+#ifdef LUA_SDK
+#include "luamanager.h"
+#include "luacachefile.h"
+#include "mountaddons.h"
+#endif
+
+#ifdef HL2SB
+#include "mountsteamcontent.h"
+#include "ticketfix.h"
+#endif
+
 extern IToolFrameworkServer *g_pToolFrameworkServer;
 extern IParticleSystemQuery *g_pParticleSystemQuery;
 
@@ -638,6 +649,17 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 	if ( !soundemitterbase->Connect( appSystemFactory ) )
 		return false;
 
+#if defined ( HL2SB )
+	//Andrew; then mount everything the user wants to use.
+	MountUserContent();
+
+	// Finally, load all of the player's addons.
+	MountAddons();
+
+	// Fixes the issue where the external ip is not matching the local ip.
+	PatchTicketValidation();
+#endif
+
 	// cache the globals
 	gpGlobals = pGlobals;
 
@@ -954,6 +976,34 @@ bool CServerGameDLL::LevelInit( const char *pMapName, char const *pMapEntities, 
 {
 	VPROF("CServerGameDLL::LevelInit");
 
+#ifdef LUA_SDK
+	lcf_recursivedeletefile( LUA_PATH_CACHE );
+
+	// Add Lua environment
+	luasrc_init();
+
+	luasrc_dofolder( L, LUA_PATH_EXTENSIONS );
+	luasrc_dofolder( L, LUA_PATH_MODULES );
+	luasrc_dofolder( L, LUA_PATH_GAME_SHARED );
+	luasrc_dofolder( L, LUA_PATH_GAME_SERVER );
+
+	luasrc_LoadWeapons();
+	luasrc_LoadEntities();
+	// luasrc_LoadEffects();
+
+	//Andrew; loadup base gamemode.
+	luasrc_LoadGamemode( LUA_BASE_GAMEMODE );
+
+	luasrc_LoadGamemode( gamemode.GetString() );
+	luasrc_SetGamemode( gamemode.GetString() );
+
+	if ( gpGlobals->maxClients > 1 )
+	{
+		// load LCF into stringtable
+		lcf_preparecachefile();
+	}
+#endif
+
 #ifdef USES_ECON_ITEMS
 	GameItemSchema_t *pItemSchema = ItemSystem()->GetItemSchema();
 	if ( pItemSchema )
@@ -1151,6 +1201,14 @@ void CServerGameDLL::ServerActivate( edict_t *pEdictList, int edictCount, int cl
 
 #ifdef NEXT_BOT
 	TheNextBots().OnMapLoaded();
+#endif
+
+//Andrew; call activate on the gamemode
+#ifdef LUA_SDK
+	BEGIN_LUA_CALL_HOOK( "ServerActivate" );
+		lua_pushinteger( L, edictCount );
+		lua_pushinteger( L, clientMax );
+	END_LUA_CALL_HOOK( 2, 0 );
 #endif
 }
 
@@ -1382,6 +1440,14 @@ void CServerGameDLL::OnQueryCvarValueFinished( QueryCvarCookie_t iCookie, edict_
 // Called when a level is shutdown (including changing levels)
 void CServerGameDLL::LevelShutdown( void )
 {
+#ifdef LUA_SDK
+	if (g_bLuaInitialized)
+	{
+		BEGIN_LUA_CALL_HOOK( "LevelShutdown" );
+		END_LUA_CALL_HOOK( 0, 0 );
+	}
+#endif
+
 #ifndef NO_STEAM
 	IGameSystem::LevelShutdownPreClearSteamAPIContextAllSystems();
 
@@ -1416,6 +1482,10 @@ void CServerGameDLL::LevelShutdown( void )
 		TheNavMesh->Reset();
 	}
 #endif
+#endif
+
+#ifdef LUA_SDK
+	luasrc_shutdown();
 #endif
 }
 
@@ -3251,6 +3321,12 @@ void CServerGameClients::GetBugReportInfo( char *buf, int buflen )
 //-----------------------------------------------------------------------------
 void CServerGameClients::NetworkIDValidated( const char *pszUserName, const char *pszNetworkID )
 {
+#ifdef LUA_SDK
+	BEGIN_LUA_CALL_HOOK( "NetworkIDValidated" );
+		lua_pushstring( L, pszUserName );
+		lua_pushstring( L, pszNetworkID );
+	END_LUA_CALL_HOOK( 2, 0 );
+#endif
 }
 
 // The client has submitted a keyvalues command
