@@ -291,7 +291,9 @@ void ResetConCommandDatabase( void )
 	for ( int i=m_ConCommandDatabase.First(); i != m_ConCommandDatabase.InvalidIndex(); i=m_ConCommandDatabase.Next( i ) )
 	{
 		ConCommand *pConCommand = m_ConCommandDatabase[ i ];
-		cvar->UnregisterConCommand(pConCommand);
+		if (cvar) {
+			cvar->UnregisterConCommand(pConCommand);
+		}
 		delete pConCommand;
 	}
 	m_ConCommandDatabase.RemoveAll();
