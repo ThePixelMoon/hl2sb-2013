@@ -97,10 +97,10 @@ static int CHL2MP_Player_CanSprint (lua_State *L) {
   return 1;
 }
 
-static int CHL2MP_Player_DoAnimationEvent (lua_State *L) {
-  luaL_checkhl2mpplayer(L, 1)->DoAnimationEvent((PlayerAnimEvent_t)luaL_checkint(L, 2), luaL_optinteger(L, 3, 0));
-  return 0;
-}
+//static int CHL2MP_Player_DoAnimationEvent (lua_State *L) {
+//  luaL_checkhl2mpplayer(L, 1)->DoAnimationEvent((PlayerAnimEvent_t)luaL_checkint(L, 2), luaL_optinteger(L, 3, 0));
+//  return 0;
+//}
 
 static int CHL2MP_Player___index (lua_State *L) {
   CHL2MP_Player *pPlayer = lua_tohl2mpplayer(L, 1);
@@ -114,11 +114,11 @@ static int CHL2MP_Player___index (lua_State *L) {
 	return lua_error(L);
   }
   const char *field = luaL_checkstring(L, 2);
-#ifdef CLIENT_DLL
-  if (Q_strcmp(field, "m_fNextThinkPushAway") == 0)
-    lua_pushnumber(L, pPlayer->m_fNextThinkPushAway);
-  else {
-#endif
+//#ifdef CLIENT_DLL
+//  if (Q_strcmp(field, "m_fNextThinkPushAway") == 0)
+//    lua_pushnumber(L, pPlayer->m_fNextThinkPushAway);
+//  else {
+//#endif
     if (pPlayer->m_nTableReference != LUA_NOREF) {
       lua_getref(L, pPlayer->m_nTableReference);
       lua_getfield(L, -1, field);
@@ -162,9 +162,9 @@ static int CHL2MP_Player___index (lua_State *L) {
         }
       }
     }
-#ifdef CLIENT_DLL
-  }
-#endif
+//#ifdef CLIENT_DLL
+//  }
+//#endif
   return 1;
 }
 
@@ -219,7 +219,7 @@ static const luaL_Reg CHL2MP_Playermeta[] = {
   {"CalculateIKLocks", CHL2MP_Player_CalculateIKLocks},
   {"CalcView", CHL2MP_Player_CalcView},
   {"CanSprint", CHL2MP_Player_CanSprint},
-  {"DoAnimationEvent", CHL2MP_Player_DoAnimationEvent},
+  //{"DoAnimationEvent", CHL2MP_Player_DoAnimationEvent},
   {"__index", CHL2MP_Player___index},
   {"__newindex", CHL2MP_Player___newindex},
   {"__eq", CHL2MP_Player___eq},
