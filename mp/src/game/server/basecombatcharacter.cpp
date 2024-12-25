@@ -3120,7 +3120,7 @@ void CBaseCombatCharacter::VPhysicsShadowCollision( int index, gamevcollisioneve
 	}
 #endif // HL2_DLL && !HL2MP
 #if defined( HL2_DLL ) && defined( HL2SB )
-	if ( HL2MPGameRules()->MegaPhyscannonActive() == true )
+	if ( HL2MPRules()->MegaPhyscannonActive() == true )
 	{
 		flOtherAttackerTime = 1.0f;
 	}
