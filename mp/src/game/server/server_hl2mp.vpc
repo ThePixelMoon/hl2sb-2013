@@ -15,8 +15,8 @@ $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\game\shared\hl2,$SRCDIR\game\shared\episodic,.\hl2,.\episodic,.\hl2mp,$SRCDIR\game\shared\hl2mp"
-		$PreprocessorDefinitions		"$BASE;HL2MP;HL2_DLL;HL2_EPISODIC;ARGG;HL2SB;"
+		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\game\shared\hl2,$SRCDIR\game\shared\episodic,.\hl2,.\episodic,.\hl2mp,$SRCDIR\game\shared\hl2mp,$SRCDIR\thirdparty\lua-5.1.5\etc,$SRCDIR\thirdparty\lua-5.1.5\src"
+		$PreprocessorDefinitions		"$BASE;HL2MP;HL2_DLL;HL2_EPISODIC;ARGG;LUA_SDK;HL2SB"
 	}
 }
 
@@ -304,10 +304,11 @@ $Project "Server (HL2MP)"
 
 		$Folder "HL2SB"
 		{
-			$File "$SRCDIR\game\shared\mountsteamcontent.cpp"
-			$File "$SRCDIR\game\shared\mountsteamcontent.h"
-			$File "ticketfix.cpp"
-			$File "ticketfix.h"
+			$File	"$SRCDIR\game\shared\mountsteamcontent.cpp"
+			$File	"$SRCDIR\game\shared\mountsteamcontent.h"
+			$File	"$SRCDIR\game\shared\hl2mp\weapon_physgun.cpp"
+			// $File	"$SRCDIR\game\shared\hl2mp\weapon_physgun_argg.cpp"
+			// $File	"$SRCDIR\game\shared\hl2mp\weapon_physgun_valve.cpp"
 		}
 	}
 }
