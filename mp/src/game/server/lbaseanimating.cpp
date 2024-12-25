@@ -173,10 +173,10 @@ static int CBaseAnimating_GetHitboxSetName (lua_State *L) {
   return 1;
 }
 
-static int CBaseAnimating_GetModelWidthScale (lua_State *L) {
-  lua_pushnumber(L, luaL_checkanimating(L, 1)->GetModelWidthScale());
-  return 1;
-}
+//static int CBaseAnimating_GetModelWidthScale (lua_State *L) {
+//  lua_pushnumber(L, luaL_checkanimating(L, 1)->GetModelWidthScale());
+//  return 1;
+//}
 
 static int CBaseAnimating_GetNumBodyGroups (lua_State *L) {
   lua_pushinteger(L, luaL_checkanimating(L, 1)->GetNumBodyGroups());
@@ -501,7 +501,7 @@ static const luaL_Reg CBaseAnimatingmeta[] = {
   {"GetHitboxSet", CBaseAnimating_GetHitboxSet},
   {"GetHitboxSetCount", CBaseAnimating_GetHitboxSetCount},
   {"GetHitboxSetName", CBaseAnimating_GetHitboxSetName},
-  {"GetModelWidthScale", CBaseAnimating_GetModelWidthScale},
+  //{"GetModelWidthScale", CBaseAnimating_GetModelWidthScale},
   {"GetNumBodyGroups", CBaseAnimating_GetNumBodyGroups},
   {"GetNumFlexControllers", CBaseAnimating_GetNumFlexControllers},
   {"GetPlaybackRate", CBaseAnimating_GetPlaybackRate},
