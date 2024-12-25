@@ -879,8 +879,6 @@ $Project
 			$File	"$SRCDIR\public\vgui_controls\lControls.h"
 			$File	"$SRCDIR\public\vgui_controls\lEditablePanel.cpp"
 			$File	"$SRCDIR\public\vgui_controls\lEditablePanel.h"
-			$File	"$SRCDIR\public\vgui_controls\lPanel.cpp"
-			$File	"$SRCDIR\public\vgui_controls\lPanel.h"
 			$File	"$SRCDIR\public\vgui_controls\lvgui_controls.cpp"
 			$File	"$SRCDIR\public\vphysics\lperformance.cpp"
 			$File	"$SRCDIR\public\vphysics\lperformance.h"
