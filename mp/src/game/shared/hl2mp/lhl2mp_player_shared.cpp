@@ -180,11 +180,11 @@ static int CHL2MP_Player___newindex (lua_State *L) {
 	return lua_error(L);
   }
   const char *field = luaL_checkstring(L, 2);
-#ifdef CLIENT_DLL
-  if (Q_strcmp(field, "m_fNextThinkPushAway") == 0)
-    pPlayer->m_fNextThinkPushAway = luaL_checknumber(L, 3);
-  else {
-#endif
+//#ifdef CLIENT_DLL
+//  if (Q_strcmp(field, "m_fNextThinkPushAway") == 0)
+//    pPlayer->m_fNextThinkPushAway = luaL_checknumber(L, 3);
+//  else {
+//#endif
     if (pPlayer->m_nTableReference == LUA_NOREF) {
       lua_newtable(L);
       pPlayer->m_nTableReference = luaL_ref(L, LUA_REGISTRYINDEX);
@@ -193,9 +193,9 @@ static int CHL2MP_Player___newindex (lua_State *L) {
     lua_pushvalue(L, 3);
     lua_setfield(L, -2, field);
 	lua_pop(L, 1);
-#ifdef CLIENT_DLL
-  }
-#endif
+//#ifdef CLIENT_DLL
+//  }
+//#endif
   return 0;
 }
 
