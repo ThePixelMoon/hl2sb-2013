@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2005, Valve Corporation, All rights reserved. ============//
+//========= Copyright ï¿½ 1996-2005, Valve Corporation, All rights reserved. ============//
 //
 // Purpose: 
 //
@@ -14,7 +14,7 @@
 #include "luasrclib.h"
 #include "vgui/lischeme.h"
 #include "vgui/lvgui.h"
-#include "vgui_controls/lPanel.h"
+#include "vgui_controls/lPanel_vgui_controls.h"
 #include "lColor.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -188,4 +188,3 @@ LUALIB_API int luaopen_scheme (lua_State *L) {
   luaL_register(L, LUA_SCHEMELIBNAME, schemelib);
   return 1;
 }
-

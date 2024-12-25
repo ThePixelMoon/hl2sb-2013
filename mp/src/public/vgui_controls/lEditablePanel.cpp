@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2005, Valve Corporation, All rights reserved. ============//
+//========= Copyright ï¿½ 1996-2005, Valve Corporation, All rights reserved. ============//
 //
 // Purpose: 
 //
@@ -12,7 +12,7 @@
 #include "luamanager.h"
 #include <vgui_controls/lEditablePanel.h>
 #include <LKeyValues.h>
-#include <vgui_controls/lPanel.h>
+#include <vgui_controls/lPanel_vgui_controls.h>
 
 using namespace vgui;
 

@@ -17,7 +17,7 @@
 #include <vgui_controls/PHandle.h>
 #include "luamanager.h"
 #include "vgui_int.h"
-#include "lPanel.h"
+#include "lPanel_vgui_controls.h"
 #include <scripted_controls/lPanel.h>
 #include "lColor.h"
 

@@ -1,4 +1,4 @@
-//===== Copyright © 1996-2005, Valve Corporation, All rights reserved. ======//
+//===== Copyright ï¿½ 1996-2005, Valve Corporation, All rights reserved. ======//
 //
 // Purpose: 
 //
@@ -14,7 +14,7 @@
 #include "luamanager.h"
 #include "luasrclib.h"
 #include "vgui/lvgui.h"
-#include "vgui_controls/lPanel.h"
+#include "vgui_controls/lPanel_vgui_controls.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -604,4 +604,3 @@ LUALIB_API int luaopen_FONTFLAG (lua_State *L) {
   END_LUA_SET_ENUM_LIB(L);
   return 0;
 }
-

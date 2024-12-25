@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2005, Valve Corporation, All rights reserved. ============//
+//========= Copyright ï¿½ 1996-2005, Valve Corporation, All rights reserved. ============//
 //
 // Purpose: 
 //
@@ -9,7 +9,7 @@
 #include <vgui/KeyCode.h>
 #include <vgui_int.h>
 #include <luamanager.h>
-#include <vgui_controls/lPanel.h>
+#include <vgui_controls/lPanel_vgui_controls.h>
 
 #include <scripted_controls/lPropertyDialog.h>
 #include <vgui_controls/PropertySheet.h>
