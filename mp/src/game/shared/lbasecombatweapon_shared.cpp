@@ -62,10 +62,10 @@ static int CBaseCombatWeapon_Activate (lua_State *L) {
   return 0;
 }
 
-static int CBaseCombatWeapon_ActivityListCount (lua_State *L) {
-  lua_pushinteger(L, luaL_checkweapon(L, 1)->ActivityListCount());
-  return 1;
-}
+//static int CBaseCombatWeapon_ActivityListCount (lua_State *L) {
+//  lua_pushinteger(L, luaL_checkweapon(L, 1)->ActivityListCount());
+//  return 1;
+//}
 
 static int CBaseCombatWeapon_ActivityOverride (lua_State *L) {
   bool *pRequired = (bool *)luaL_checkboolean(L, 3);
@@ -972,7 +972,7 @@ static int CBaseCombatWeapon___tostring (lua_State *L) {
 static const luaL_Reg CBaseCombatWeaponmeta[] = {
   {"AbortReload", CBaseCombatWeapon_AbortReload},
   {"Activate", CBaseCombatWeapon_Activate},
-  {"ActivityListCount", CBaseCombatWeapon_ActivityListCount},
+  //{"ActivityListCount", CBaseCombatWeapon_ActivityListCount},
   {"ActivityOverride", CBaseCombatWeapon_ActivityOverride},
   {"AddViewKick", CBaseCombatWeapon_AddViewKick},
   {"AllowsAutoSwitchFrom", CBaseCombatWeapon_AllowsAutoSwitchFrom},
