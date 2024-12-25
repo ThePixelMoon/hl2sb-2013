@@ -301,5 +301,11 @@ $Project "Server (HL2MP)"
 				$File	"$SRCDIR\game\shared\hl2mp\weapon_stunstick.cpp"
 			}
 		}
+
+		$Folder "HL2SB"
+		{
+			$File "$SRCDIR\game\shared\mountsteamcontent.cpp"
+			$File "$SRCDIR\game\shared\mountsteamcontent.h"
+		}
 	}
 }
