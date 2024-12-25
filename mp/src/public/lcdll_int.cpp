@@ -239,15 +239,15 @@ static int engine_IsBoxInViewCluster (lua_State *L) {
   return 1;
 }
 
-static int engine_IsBoxVisible (lua_State *L) {
-  luaL_checkint(L, engine->IsBoxVisible(luaL_checkvector(L, 1), luaL_checkvector(L, 2)));
-  return 1;
-}
+//static int engine_IsBoxVisible (lua_State *L) {
+//  luaL_checkint(L, engine->IsBoxVisible(luaL_checkvector(L, 1), luaL_checkvector(L, 2)));
+//  return 1;
+//}
 
-static int engine_IsConnected (lua_State *L) {
-  lua_pushboolean(L, engine->IsConnected());
-  return 1;
-}
+//static int engine_IsConnected (lua_State *L) {
+//  lua_pushboolean(L, engine->IsConnected());
+//  return 1;
+//}
 
 static int engine_IsDrawingLoadingImage (lua_State *L) {
   lua_pushboolean(L, engine->IsDrawingLoadingImage());
@@ -486,8 +486,8 @@ static const luaL_Reg enginelib[] = {
   {"GetUILanguage",     engine_GetUILanguage},
   {"GrabPreColorCorrectedFrame",     engine_GrabPreColorCorrectedFrame},
   {"IsBoxInViewCluster",     engine_IsBoxInViewCluster},
-  {"IsBoxVisible",     engine_IsBoxVisible},
-  {"IsConnected", engine_IsConnected},
+  //{"IsBoxVisible",     engine_IsBoxVisible},
+  //{"IsConnected", engine_IsConnected},
   {"IsDrawingLoadingImage",   engine_IsDrawingLoadingImage},
   {"IsHammerRunning",   engine_IsHammerRunning},
   {"IsHLTV",  engine_IsHLTV},
