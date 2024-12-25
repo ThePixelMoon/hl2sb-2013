@@ -659,7 +659,7 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 #endif
 
 	// Fixes the issue where the external ip is not matching the local ip.
-	PatchTicketValidation();
+	// PatchTicketValidation();
 #endif
 
 	// cache the globals
