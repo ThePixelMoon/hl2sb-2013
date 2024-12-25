@@ -174,7 +174,7 @@ public:
 	bool	IsTeamplay( void ) { return m_bTeamPlayEnabled;	}
 #ifdef LUA_SDK
 #ifndef CLIENT_DLL
-	bool	FPlayerCanTakeDamage( CBasePlayer *pPlayer, CBaseEntity *pAttacker );
+	// bool	FPlayerCanTakeDamage( CBasePlayer *pPlayer, CBaseEntity *pAttacker );
 	bool	AllowDamage( CBaseEntity *pVictim, const CTakeDamageInfo &info );
 
 	void	PlayerSpawn( CBasePlayer *pPlayer );
