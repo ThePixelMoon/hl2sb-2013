@@ -1554,6 +1554,9 @@ bool CBaseCombatCharacter::BecomeRagdoll( const CTakeDamageInfo &info, const Vec
 #if !defined( HL2MP )
 	bMegaPhyscannonActive = HL2GameRules()->MegaPhyscannonActive();
 #endif // !HL2MP
+#if defined( HL2SB )
+	bMegaPhyscannonActive = HL2MPRules()->MegaPhyscannonActive();
+#endif // HL2SB
 
 	// Mega physgun requires everything to be a server-side ragdoll
 	if ( m_bForceServerRagdoll == true || ( ( bMegaPhyscannonActive == true ) && !IsPlayer() && Classify() != CLASS_PLAYER_ALLY_VITAL && Classify() != CLASS_PLAYER_ALLY ) )
@@ -3116,6 +3119,12 @@ void CBaseCombatCharacter::VPhysicsShadowCollision( int index, gamevcollisioneve
 		flOtherAttackerTime = 1.0f;
 	}
 #endif // HL2_DLL && !HL2MP
+#if defined( HL2_DLL ) && defined( HL2SB )
+	if ( HL2MPGameRules()->MegaPhyscannonActive() == true )
+	{
+		flOtherAttackerTime = 1.0f;
+	}
+#endif // HL2_DLL && HL2SB
 
 	if ( this == pOther->HasPhysicsAttacker( flOtherAttackerTime ) )
 		return;
@@ -3601,4 +3610,3 @@ float CBaseCombatCharacter::GetTimeSinceLastInjury( int team /*= TEAM_ANY */ ) c
 
 	return never;
 }
-
