@@ -18,6 +18,13 @@
 #include "engine/IEngineSound.h"
 #include "SoundEmitterSystem/isoundemittersystembase.h"
 
+#ifdef LUA_SDK
+#include "luamanager.h"
+#include "lhl2mp_player_shared.h"
+#include "mathlib/lvector.h"
+#include "lvphysics_interface.h"
+#endif
+
 extern ConVar sv_footsteps;
 
 const char *g_ppszPlayerSoundPrefixNames[PLAYER_SOUNDS_MAX] =
