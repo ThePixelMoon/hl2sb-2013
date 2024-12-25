@@ -42,9 +42,9 @@ LUA_API lua_FireBulletsInfo_t lua_tofirebulletsinfo (lua_State *L, int idx) {
   if (!lua_isnil(L, -1))
     info.m_iAmmoType = luaL_checkint(L, -1);
   lua_pop(L, 1);
-  lua_getfield(L, idx, "m_iDamage");
+  lua_getfield(L, idx, "m_flDamage");
   if (!lua_isnil(L, -1))
-    info.m_iDamage = luaL_checkint(L, -1);
+    info.m_flDamage = luaL_checknumber(L, -1);
   lua_pop(L, 1);
   lua_getfield(L, idx, "m_iPlayerDamage");
   if (!lua_isnil(L, -1))
