@@ -1477,7 +1477,7 @@ public:
 	virtual void			Reset();
 
 	// Add a single file to a zip - maintains the zip's previous alignment state
-	virtual void			AddFileToZip( const char *relativename, const char *fullpath );
+	virtual void			AddFileToZip( const char *relativename, const char *fullpath, eCompressionType compressionType = eCompressionType_None );
 
 	// Whether a file is contained in a zip - maintains alignment
 	virtual bool			FileExistsInZip( const char *pRelativeName );
@@ -1499,7 +1499,7 @@ public:
 	virtual unsigned int	EstimateSize( void );
 
 	// Add buffer to zip as a file with given name - uses current alignment size, default 0 (no alignment)
-	virtual void			AddBufferToZip( const char *relativename, void *data, int length, bool bTextMode );
+	virtual void			AddBufferToZip( const char *relativename, void *data, int length, bool bTextMode, eCompressionType compressionType = eCompressionType_None );
 
 	// Writes out zip file to a buffer - uses current alignment size 
 	// (set by file's previous alignment, or a call to ForceAlignment)
@@ -1565,7 +1565,7 @@ void CZip::ActivateByteSwapping( bool bActivate )
 	m_ZipFile.ActivateByteSwapping( bActivate );
 }
 
-void CZip::AddFileToZip( const char *relativename, const char *fullpath )
+void CZip::AddFileToZip( const char *relativename, const char *fullpath, eCompressionType compressionType )
 {
 	m_ZipFile.AddFileToZip( relativename, fullpath );
 }
@@ -1611,7 +1611,7 @@ unsigned int CZip::EstimateSize( void )
 }
 
 // Add buffer to zip as a file with given name
-void CZip::AddBufferToZip( const char *relativename, void *data, int length, bool bTextMode )
+void CZip::AddBufferToZip( const char *relativename, void *data, int length, bool bTextMode, eCompressionType compressionType )
 {
 	m_ZipFile.AddBufferToZip( relativename, data, length, bTextMode );
 }
