@@ -43,7 +43,7 @@ LUA_API lua_HFont lua_tofont (lua_State *L, int idx) {
 
 
 LUA_API void lua_pushscheme (lua_State *L, HScheme hScheme) {
-  lua_HScheme *phScheme = (lua_HFont *)lua_newuserdata(L, sizeof(hScheme));
+  lua_HScheme *phScheme = (lua_HScheme *)lua_newuserdata(L, sizeof(hScheme));
   *phScheme = hScheme;
   luaL_getmetatable(L, "HScheme");
   lua_setmetatable(L, -2);
