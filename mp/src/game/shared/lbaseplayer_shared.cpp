@@ -180,10 +180,10 @@ static int CBasePlayer_GetDefaultFOV (lua_State *L) {
   return 1;
 }
 
-static int CBasePlayer_GetEFNoInterpParity (lua_State *L) {
-  lua_pushinteger(L, luaL_checkplayer(L, 1)->GetEFNoInterpParity());
-  return 1;
-}
+//static int CBasePlayer_GetEFNoInterpParity (lua_State *L) {
+//  lua_pushinteger(L, luaL_checkplayer(L, 1)->GetEFNoInterpParity());
+//  return 1;
+//}
 
 static int CBasePlayer_GetFOV (lua_State *L) {
   lua_pushnumber(L, luaL_checkplayer(L, 1)->GetFOV());
@@ -933,7 +933,7 @@ static const luaL_Reg CBasePlayermeta[] = {
   {"GetBonusProgress", CBasePlayer_GetBonusProgress},
   {"GetDeathTime", CBasePlayer_GetDeathTime},
   {"GetDefaultFOV", CBasePlayer_GetDefaultFOV},
-  {"GetEFNoInterpParity", CBasePlayer_GetEFNoInterpParity},
+  //{"GetEFNoInterpParity", CBasePlayer_GetEFNoInterpParity},
   {"GetFOV", CBasePlayer_GetFOV},
   {"GetFOVDistanceAdjustFactor", CBasePlayer_GetFOVDistanceAdjustFactor},
   {"GetFOVTime", CBasePlayer_GetFOVTime},
