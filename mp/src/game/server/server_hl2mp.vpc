@@ -306,6 +306,8 @@ $Project "Server (HL2MP)"
 		{
 			$File "$SRCDIR\game\shared\mountsteamcontent.cpp"
 			$File "$SRCDIR\game\shared\mountsteamcontent.h"
+			$File "ticketfix.cpp"
+			$File "ticketfix.h"
 		}
 	}
 }
