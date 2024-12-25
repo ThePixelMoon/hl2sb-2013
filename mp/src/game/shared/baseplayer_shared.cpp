@@ -53,6 +53,15 @@
 
 // NVNT haptic utils
 #include "haptics/haptic_utils.h"
+
+#if defined( LUA_SDK )
+
+	#include "luamanager.h"
+	#include "lbaseplayer_shared.h"
+	#include "mathlib/lvector.h"
+
+#endif
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -2106,4 +2115,3 @@ bool fogparams_t::operator !=( const fogparams_t& other ) const
 
 	return false;
 }
-
