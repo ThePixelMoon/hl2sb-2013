@@ -67,7 +67,7 @@ $Configuration
 		$SystemFrameworks				"Carbon" [$OSXALL]
 		$SystemLibraries				"rt" [$LINUXALL]
 		$IgnoreImportLibrary			"TRUE"
-		$AdditionalDependencies			"$BASE winmm.lib legacy_stdio_definitions.lib"	[$WIN32]
+		$AdditionalDependencies			"$BASE winmm.lib legacy_stdio_definitions.lib lua51.lib"	[$WIN32]
 		$AdditionalDependencies			"$BASE wsock32.lib Ws2_32.lib" [$BUILD_REPLAY]
 		$ForceFileOutput				"Multiply Defined Symbol Only (/FORCE:MULTIPLE)" [$VS2022]
 	}
@@ -1363,6 +1363,7 @@ $Project
 		$Lib		bitmap
 		$Lib		choreoobjects
 		$Lib		dmxloader
+		$Lib		lua51
 		$Lib		mathlib
 		$Lib		matsys_controls
 		$Lib		particles
