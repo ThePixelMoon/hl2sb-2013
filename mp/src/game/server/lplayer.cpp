@@ -262,10 +262,10 @@ static int CBasePlayer_Weapon_DropSlot (lua_State *L) {
   return 0;
 }
 
-static int CBasePlayer_Weapon_GetLast (lua_State *L) {
-  lua_pushweapon(L, luaL_checkplayer(L, 1)->Weapon_GetLast());
-  return 1;
-}
+//static int CBasePlayer_Weapon_GetLast (lua_State *L) {
+//  lua_pushweapon(L, luaL_checkplayer(L, 1)->Weapon_GetLast());
+//  return 1;
+//}
 
 static int CBasePlayer_HasAnyAmmoOfType (lua_State *L) {
   lua_pushboolean(L, luaL_checkplayer(L, 1)->HasAnyAmmoOfType(luaL_checkinteger(L, 2)));
@@ -544,7 +544,7 @@ static const luaL_Reg CBasePlayermeta[] = {
   {"Weapon_Equip", CBasePlayer_Weapon_Equip},
   {"Weapon_Drop", CBasePlayer_Weapon_Drop},
   {"Weapon_DropSlot", CBasePlayer_Weapon_DropSlot},
-  {"Weapon_GetLast", CBasePlayer_Weapon_GetLast},
+  //{"Weapon_GetLast", CBasePlayer_Weapon_GetLast},
   {"HasAnyAmmoOfType", CBasePlayer_HasAnyAmmoOfType},
   {"RumbleEffect", CBasePlayer_RumbleEffect},
   {"IsOnLadder", CBasePlayer_IsOnLadder},
