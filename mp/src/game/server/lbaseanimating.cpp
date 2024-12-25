@@ -351,10 +351,10 @@ static int CBaseAnimating_SetHitboxSetByName (lua_State *L) {
   return 0;
 }
 
-static int CBaseAnimating_SetModelWidthScale (lua_State *L) {
-  luaL_checkanimating(L, 1)->SetModelWidthScale(luaL_checknumber(L, 2));
-  return 0;
-}
+//static int CBaseAnimating_SetModelWidthScale (lua_State *L) {
+//  luaL_checkanimating(L, 1)->SetModelWidthScale(luaL_checknumber(L, 2));
+//  return 0;
+//}
 
 static int CBaseAnimating_SetPlaybackRate (lua_State *L) {
   luaL_checkanimating(L, 1)->SetPlaybackRate(luaL_checknumber(L, 2));

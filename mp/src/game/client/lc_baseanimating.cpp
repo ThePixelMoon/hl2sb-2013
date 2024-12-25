@@ -587,10 +587,10 @@ static int CBaseAnimating_RemoveFromClientSideAnimationList (lua_State *L) {
   return 0;
 }
 
-static int CBaseAnimating_ResetEventsParity (lua_State *L) {
-  luaL_checkanimating(L, 1)->ResetEventsParity();
-  return 0;
-}
+//static int CBaseAnimating_ResetEventsParity (lua_State *L) {
+//  luaL_checkanimating(L, 1)->ResetEventsParity();
+//  return 0;
+//}
 
 static int CBaseAnimating_ResetLatched (lua_State *L) {
   luaL_checkanimating(L, 1)->ResetLatched();
@@ -660,10 +660,10 @@ static int CBaseAnimating_SetHitboxSetByName (lua_State *L) {
   return 0;
 }
 
-static int CBaseAnimating_SetModelWidthScale (lua_State *L) {
-  luaL_checkanimating(L, 1)->SetModelWidthScale(luaL_checknumber(L, 2));
-  return 0;
-}
+//static int CBaseAnimating_SetModelWidthScale (lua_State *L) {
+//  luaL_checkanimating(L, 1)->SetModelWidthScale(luaL_checknumber(L, 2));
+//  return 0;
+//}
 
 static int CBaseAnimating_SetPlaybackRate (lua_State *L) {
   luaL_checkanimating(L, 1)->SetPlaybackRate(luaL_checknumber(L, 2));
@@ -992,7 +992,7 @@ static const luaL_Reg CBaseAnimatingmeta[] = {
   {"RagdollMoved", CBaseAnimating_RagdollMoved},
   {"Release", CBaseAnimating_Release},
   {"RemoveFromClientSideAnimationList", CBaseAnimating_RemoveFromClientSideAnimationList},
-  {"ResetEventsParity", CBaseAnimating_ResetEventsParity},
+  //{"ResetEventsParity", CBaseAnimating_ResetEventsParity},
   {"ResetLatched", CBaseAnimating_ResetLatched},
   {"ResetSequence", CBaseAnimating_ResetSequence},
   {"ResetSequenceInfo", CBaseAnimating_ResetSequenceInfo},
@@ -1005,7 +1005,7 @@ static const luaL_Reg CBaseAnimatingmeta[] = {
   {"SetCycle", CBaseAnimating_SetCycle},
   {"SetHitboxSet", CBaseAnimating_SetHitboxSet},
   {"SetHitboxSetByName", CBaseAnimating_SetHitboxSetByName},
-  {"SetModelWidthScale", CBaseAnimating_SetModelWidthScale},
+  //{"SetModelWidthScale", CBaseAnimating_SetModelWidthScale},
   {"SetPlaybackRate", CBaseAnimating_SetPlaybackRate},
   {"SetPoseParameter", CBaseAnimating_SetPoseParameter},
   {"SetPredictable", CBaseAnimating_SetPredictable},
