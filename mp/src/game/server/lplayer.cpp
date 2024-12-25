@@ -182,10 +182,10 @@ static int CBasePlayer_Event_KilledOther (lua_State *L) {
   return 0;
 }
 
-static int CBasePlayer_Event_Dying (lua_State *L) {
-  luaL_checkplayer(L, 1)->Event_Dying();
-  return 0;
-}
+//static int CBasePlayer_Event_Dying (lua_State *L) {
+//  luaL_checkplayer(L, 1)->Event_Dying();
+//  return 0;
+//}
 
 static int CBasePlayer_IsNetClient (lua_State *L) {
   lua_pushboolean(L, luaL_checkplayer(L, 1)->IsNetClient());
@@ -528,7 +528,7 @@ static const luaL_Reg CBasePlayermeta[] = {
   {"OnTakeDamage_Alive", CBasePlayer_OnTakeDamage_Alive},
   {"Event_Killed", CBasePlayer_Event_Killed},
   {"Event_KilledOther", CBasePlayer_Event_KilledOther},
-  {"Event_Dying", CBasePlayer_Event_Dying},
+  //{"Event_Dying", CBasePlayer_Event_Dying},
   {"IsNetClient", CBasePlayer_IsNetClient},
   {"IsFakeClient", CBasePlayer_IsFakeClient},
   {"GetClientIndex", CBasePlayer_GetClientIndex},
