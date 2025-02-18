@@ -1,1 +1,1 @@
-devtools\bin\vpc.exe /hl2mp +everything /mksln everything.sln /define:VS2022
+devtools\bin\vpc.exe /hl2mp /tf /define:SOURCESDK +everything /mksln everything.sln

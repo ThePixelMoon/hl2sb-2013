@@ -135,6 +135,8 @@ public:
 	void CleanUpMap();
 	void CheckRestartGame();
 	void RestartGame();
+
+	void OnNavMeshLoad( void );
 	
 #ifndef CLIENT_DLL
 	virtual Vector VecItemRespawnSpot( CItem *pItem );
@@ -157,6 +159,9 @@ public:
 	virtual void InitDefaultAIRelationships( void );
 #endif
 #endif
+
+	bool IsOfficialMap( void );
+
 	virtual void ClientDisconnected( edict_t *pClient );
 
 #ifdef LUA_SDK

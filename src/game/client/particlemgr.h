@@ -119,6 +119,12 @@ entities. Each one is useful under different conditions.
 #include "tier0/fasttimer.h"
 #include "utllinkedlist.h"
 #include "utldict.h"
+<<<<<<< HEAD
+=======
+#if defined( WIN32 ) && _MSC_VER <= 1920
+#include <typeinfo.h>
+#else
+>>>>>>> 0759e2e8 (Add Team Fortress 2 SDK)
 #include <typeinfo>
 #include "tier1/utlintrusivelist.h"
 #include "tier1/utlstring.h"

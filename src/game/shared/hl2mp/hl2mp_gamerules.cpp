@@ -29,6 +29,7 @@
 	#include "c_hl2mp_player.h"
 #else
 
+	#include "nav_mesh.h"
 	#include "eventqueue.h"
 	#include "player.h"
 	#include "gamerules.h"
@@ -49,10 +50,6 @@
 #endif
 	#include "hl2mp_gameinterface.h"
 	#include "hl2mp_cvars.h"
-
-#if defined( DEBUG ) || defined( LUA_SDK )	
-	#include "hl2mp_bot_temp.h"
-#endif
 
 extern void respawn(CBaseEntity *pEdict, bool fCopyCorpse);
 
@@ -1376,6 +1373,37 @@ void CHL2MPRules::Precache( void )
 #endif
 }
 
+#ifdef GAME_DLL
+bool CHL2MPRules::IsOfficialMap( void )
+{ 
+	static const char *s_OfficialMaps[] =
+	{
+		"devtest",
+		"dm_lockdown",
+		"dm_overwatch",
+		"dm_powerhouse",
+		"dm_resistance",
+		"dm_runoff",
+		"dm_steamlab",
+		"dm_underpass",
+		"halls3",
+	};
+
+	char szCurrentMap[MAX_MAP_NAME];
+	Q_strncpy( szCurrentMap, STRING( gpGlobals->mapname ), sizeof( szCurrentMap ) );
+
+	for ( int i = 0; i < ARRAYSIZE( s_OfficialMaps ); ++i )
+	{
+		if ( !Q_stricmp( s_OfficialMaps[i], szCurrentMap ) )
+		{
+			return true;
+		}
+	}
+
+	return BaseClass::IsOfficialMap();
+}
+#endif
+
 bool CHL2MPRules::ShouldCollide( int collisionGroup0, int collisionGroup1 )
 {
 #if defined ( LUA_SDK )
@@ -1560,7 +1588,7 @@ CAmmoDef *GetAmmoDef()
 
 #else
 
-#if defined( DEBUG ) || defined( LUA_SDK )
+#ifdef DEBUG
 
 	// Handler for the "bot" command.
 	void Bot_f()
@@ -1582,23 +1610,8 @@ CAmmoDef *GetAmmoDef()
 	}
 
 
-#ifndef LUA_SDK
 	ConCommand cc_Bot( "bot", Bot_f, "Add a bot.", FCVAR_CHEAT );
-#else
-	ConCommand cc_Bot( "bot", Bot_f, "Add a bot." );
-#endif
 
-#endif
-
-	bool CHL2MPRules::FShouldSwitchWeapon( CBasePlayer *pPlayer, CBaseCombatWeapon *pWeapon )
-	{		
-#if defined ( LUA_SDK )
-		BEGIN_LUA_CALL_HOOK( "FShouldSwitchWeapon" );
-			lua_pushplayer( L, pPlayer );
-			lua_pushweapon( L, pWeapon );
-		END_LUA_CALL_HOOK( 2, 1 );
-
-		RETURN_LUA_BOOLEAN();
 #endif
 
 		if ( pPlayer->GetActiveWeapon() && pPlayer->IsNetClient() )
@@ -1686,6 +1699,13 @@ void CHL2MPRules::RestartGame()
 		gameeventmanager->FireEvent( event );
 	}
 }
+
+#ifdef GAME_DLL
+void CHL2MPRules::OnNavMeshLoad( void )
+{
+	TheNavMesh->SetPlayerSpawnName( "info_player_deathmatch" );
+}
+#endif
 
 void CHL2MPRules::CleanUpMap()
 {
@@ -1917,6 +1937,7 @@ const char *CHL2MPRules::GetChatFormat( bool bTeamOnly, CBasePlayer *pPlayer )
 	return pszFormat;
 }
 
+<<<<<<< HEAD
 #ifdef HL2SB
 //------------------------------------------------------------------------------
 // Purpose : Initialize all default class relationships
@@ -2849,3 +2870,6 @@ void CHL2MPRules::InitDefaultAIRelationships( void )
 }
 #endif
 #endif
+=======
+#endif
+>>>>>>> 0759e2e8 (Add Team Fortress 2 SDK)

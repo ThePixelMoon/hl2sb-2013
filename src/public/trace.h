@@ -59,7 +59,7 @@ public:
 	bool			allsolid;				// if true, plane is not valid
 	bool			startsolid;				// if true, the initial point was in a solid area
 
-	CBaseTrace() {}
+	CBaseTrace() = default;
 
 #if !defined ( LUA_SDK )
 	// HACKHACK: We only do this for Lua, but Lua classes which use traces will

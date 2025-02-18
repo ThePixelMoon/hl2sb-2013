@@ -272,7 +272,7 @@ public:
 				if ( !m_pParent->IsWithin( screenx, screeny ) )
 				{
 					Panel *page = reinterpret_cast< Panel * >( data->GetPtr( "propertypage" ) );
-					PropertySheet *sheet = reinterpret_cast< PropertySheet * >( data->GetPtr( "propertysheet" ) );
+					sheet = reinterpret_cast< PropertySheet * >( data->GetPtr( "propertysheet" ) );
 					char const *title = data->GetString( "tabname", "" );
 					if ( !page || !sheet )
 						return;
@@ -564,7 +564,9 @@ void PropertySheet::SetDraggableTabs( bool state )
 void PropertySheet::SetSmallTabs( bool state )
 {
 	m_bSmallTabs = state;
-	m_tabFont = scheme()->GetIScheme( GetScheme() )->GetFont( m_bSmallTabs ? "DefaultVerySmall" : "Default" );
+	if ( m_bOverrideTabFont )
+		return;
+	m_tabFont = scheme()->GetIScheme( GetScheme() )->GetFont( m_bSmallTabs ? "DefaultVerySmall" : "Default", IsProportional() );
 	int c = m_PageTabs.Count();
 	for ( int i = 0; i < c ; ++i )
 	{
@@ -572,6 +574,22 @@ void PropertySheet::SetSmallTabs( bool state )
 		Assert( tab );
 		tab->SetFont( m_tabFont );
 	}
+}
+
+void PropertySheet::SetTabFont( vgui::HFont hFont )
+{
+	if ( m_tabFont == hFont )
+		return;
+
+	m_tabFont = hFont;
+	int c = m_PageTabs.Count();
+	for ( int i = 0; i < c ; ++i )
+	{
+		PageTab *tab = m_PageTabs[ i ];
+		Assert( tab );
+		tab->SetFont( m_tabFont );
+	}
+	m_bOverrideTabFont = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -900,7 +918,7 @@ void PropertySheet::ApplySchemeSettings(IScheme *pScheme)
 	SetBorder(pBorder);
 	m_flPageTransitionEffectTime = atof(pScheme->GetResourceString("PropertySheet.TransitionEffectTime"));
 
-	m_tabFont = pScheme->GetFont( m_bSmallTabs ? "DefaultVerySmall" : "Default" );
+	m_tabFont = pScheme->GetFont( m_bSmallTabs ? "DefaultVerySmall" : "Default", IsProportional() );
 
 	if ( m_pTabKV )
 	{
@@ -976,18 +994,21 @@ void PropertySheet::PaintBorder()
 	if (!border)
 		return;
 
+	int nRepeats = Max( QuickPropScale( 1 ), 1 );
+
 	// draw the border, but with a break at the active tab
 	int px = 0, py = 0, pwide = 0, ptall = 0;
 	if (_activeTab)
 	{
 		_activeTab->GetBounds(px, py, pwide, ptall);
-		ptall -= 1;
+		ptall -= nRepeats;
 	}
+
 
 	// draw the border underneath the buttons, with a break
 	int wide, tall;
 	GetSize(wide, tall);
-	border->Paint(0, py + ptall, wide, tall, IBorder::SIDE_TOP, px + 1, px + pwide - 1);
+	border->Paint2(0, py + ptall, wide, tall, IBorder::SIDE_TOP, px + nRepeats, px + pwide - nRepeats, nRepeats);
 }
 
 //-----------------------------------------------------------------------------
@@ -1411,6 +1432,7 @@ void PropertySheet::OnKeyCodePressed(KeyCode code)
 		case KEY_XBUTTON_RIGHT:
 		case KEY_XSTICK1_RIGHT:
 		case KEY_XSTICK2_RIGHT:
+		case STEAMCONTROLLER_DPAD_RIGHT:
 			{
 				ChangeActiveTab(_activeTabIndex+1);
 				break;
@@ -1419,6 +1441,7 @@ void PropertySheet::OnKeyCodePressed(KeyCode code)
 		case KEY_XBUTTON_LEFT:
 		case KEY_XSTICK1_LEFT:
 		case KEY_XSTICK2_LEFT:
+		case STEAMCONTROLLER_DPAD_LEFT:
 			{
 				ChangeActiveTab(_activeTabIndex-1);
 				break;

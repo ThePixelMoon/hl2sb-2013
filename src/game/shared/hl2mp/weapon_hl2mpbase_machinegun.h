@@ -6,9 +6,7 @@
 
 #if !defined( HL2SB )
 #include "weapon_hl2mpbase.h"
-#else
 #include "weapon_hl2mpbasehlmpcombatweapon.h"
-#endif
 
 #ifndef BASEHLCOMBATWEAPON_H
 #define BASEHLCOMBATWEAPON_H
@@ -23,14 +21,10 @@
 //=========================================================
 // Machine gun base class
 //=========================================================
-#if !defined( HL2SB )
-class CHL2MPMachineGun : public CWeaponHL2MPBase
-#else
 class CHL2MPMachineGun : public CBaseHL2MPCombatWeapon
-#endif
 {
 public:
-	DECLARE_CLASS( CHL2MPMachineGun, CWeaponHL2MPBase );
+	DECLARE_CLASS( CHL2MPMachineGun, CBaseHL2MPCombatWeapon );
 	DECLARE_DATADESC();
 
 	CHL2MPMachineGun();

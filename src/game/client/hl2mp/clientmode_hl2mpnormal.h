@@ -24,11 +24,6 @@ class CHudViewport;
 class CScriptedClientLuaPanel;
 #endif
 
-namespace vgui
-{
-	typedef unsigned long HScheme;
-}
-
 
 //-----------------------------------------------------------------------------
 // Purpose: 

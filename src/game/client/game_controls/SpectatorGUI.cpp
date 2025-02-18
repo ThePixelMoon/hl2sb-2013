@@ -6,6 +6,8 @@
 //=============================================================================//
 
 #include "cbase.h"
+#include "inputsystem/iinputsystem.h"
+#include "input.h"
 #include <cdll_client_int.h>
 #include <globalvars_base.h>
 #include <cdll_util.h>
@@ -149,7 +151,8 @@ CSpectatorMenu::CSpectatorMenu( IViewPort *pViewPort ) : Frame( NULL, PANEL_SPEC
 	menu->LoadFromFile("Resource/spectatormodes.res");
 	m_pViewOptions->SetMenu( menu );	// attach menu to combo box
 
-	LoadControlSettings("Resource/UI/BottomSpectator.res");
+	LoadControlSettings( "Resource/UI/BottomSpectator.res" );
+
 	ListenForGameEvent( "spec_target_updated" );
 }
 
@@ -253,8 +256,8 @@ void CSpectatorMenu::FireGameEvent( IGameEvent * event )
 		{
 			for ( int i=0; i<m_pPlayerList->GetItemCount(); ++i )
 			{
-				KeyValues *kv = m_pPlayerList->GetItemUserData( i );
-				if ( kv && FStrEq( kv->GetString( "player" ), selectedPlayerName ) )
+				KeyValues *pKv = m_pPlayerList->GetItemUserData( i );
+				if ( pKv && FStrEq( pKv->GetString( "player" ), selectedPlayerName ) )
 				{
 					m_pPlayerList->ActivateItemByRow( i );
 					break;
@@ -283,6 +286,8 @@ void CSpectatorMenu::ShowPanel(bool bShow)
 
 	if ( bShow )
 	{
+		// Force relayout in case Steam Controller stuff has changed.
+		InvalidateLayout( true, true );
 		Activate();
 		SetMouseInputEnabled( true );
 		SetKeyBoardInputEnabled( true );
@@ -296,11 +301,11 @@ void CSpectatorMenu::ShowPanel(bool bShow)
 
 	bool bIsEnabled = true;
 	
-	 if ( engine->IsHLTV() && HLTVCamera()->IsPVSLocked() )
+	if ( engine->IsHLTV() && HLTVCamera()->IsPVSLocked() )
 	{
 		 // when watching HLTV or Replay with a locked PVS, some elements are disabled
 		 bIsEnabled = false;
-	 }
+	}
 	
 	m_pLeftButton->SetVisible( bIsEnabled );
 	m_pRightButton->SetVisible( bIsEnabled );
@@ -352,11 +357,11 @@ void CSpectatorMenu::Update( void )
 				team = teamText;
 			}
 
-			g_pVGuiLocalize->ConstructString( playerText, sizeof( playerText ), g_pVGuiLocalize->Find( "#Spec_PlayerItem_Team" ), 2, playerName, team );
+			g_pVGuiLocalize->ConstructString_safe( playerText, g_pVGuiLocalize->Find( "#Spec_PlayerItem_Team" ), 2, playerName, team );
 		}
 		else
 		{
-			g_pVGuiLocalize->ConstructString( playerText, sizeof( playerText ), g_pVGuiLocalize->Find( "#Spec_PlayerItem" ), 1, playerName );
+			g_pVGuiLocalize->ConstructString_safe( playerText, g_pVGuiLocalize->Find( "#Spec_PlayerItem" ), 1, playerName );
 		}
 
 		Q_snprintf( szPlayerIndex, sizeof( szPlayerIndex ), "%d", iPlayerIndex );
@@ -524,6 +529,13 @@ void CSpectatorGUI::OnThink()
 				gViewPortInterface->ShowPanel( PANEL_SCOREBOARD, m_bSpecScoreboard );
 			}
 		}
+
+#ifdef TF_CLIENT_DLL
+		if ( TFGameRules() && TFGameRules()->ShowMatchSummary() )
+		{
+			SetVisible( false );
+		}
+#endif
 	}
 }
 
@@ -581,9 +593,30 @@ void CSpectatorGUI::ShowPanel(bool bShow)
 {
 	if ( bShow && !IsVisible() )
 	{
+		// Josh: Someone made this InvalidateLayout with reloadScheme = true
+		// every time when adding SteamController support, when it should only
+		// have done this if the state changes, because otherwise whenever
+		// you died, it recreates all elements.
+		// Which is a problem because:
+		// 1) This is incredibly slow!!
+		// 2) CItemModelPanels have a child of themselves,
+		//    so each time we invalidated, we would make a new one entirely
+		//    and keep making them, over and over again every time
+		//    causing a chain of hundreds of children, causing immense lag on death
+		//    and each time they'd all reload their scheme, and add a new one! Argh!
+		// So let's only invalidate this if switch from using a Vapourous Controller <-> not.
+		const bool bWasSteamController = g_pInputSystem->IsSteamControllerActive();
+
+		if ( m_iWasSteamController == -1 || !!m_iWasSteamController != bWasSteamController )
+		{
+			InvalidateLayout( true, true );
+			m_iWasSteamController = bWasSteamController ? 1 : 0;
+		}
 		m_bSpecScoreboard = false;
 	}
+
 	SetVisible( bShow );
+
 	if ( !bShow && m_bSpecScoreboard )
 	{
 		gViewPortInterface->ShowPanel( PANEL_SCOREBOARD, false );
@@ -658,11 +691,11 @@ void CSpectatorGUI::Update()
 		if ( iHealth > 0  && gr->IsAlive(playernum) )
 		{
 			_snwprintf( health, ARRAYSIZE( health ), L"%i", iHealth );
-			g_pVGuiLocalize->ConstructString( playerText, sizeof( playerText ), g_pVGuiLocalize->Find( "#Spec_PlayerItem_Team" ), 2, playerName,  health );
+			g_pVGuiLocalize->ConstructString_safe( playerText, g_pVGuiLocalize->Find( "#Spec_PlayerItem_Team" ), 2, playerName,  health );
 		}
 		else
 		{
-			g_pVGuiLocalize->ConstructString( playerText, sizeof( playerText ), g_pVGuiLocalize->Find( "#Spec_PlayerItem" ), 1, playerName );
+			g_pVGuiLocalize->ConstructString_safe( playerText, g_pVGuiLocalize->Find( "#Spec_PlayerItem" ), 1, playerName );
 		}
 
 		m_pPlayerLabel->SetText( playerText );
@@ -693,13 +726,28 @@ void CSpectatorGUI::Update()
 
 		wchar_t wMapName[64];
 		g_pVGuiLocalize->ConvertANSIToUnicode(tempstr,wMapName,sizeof(wMapName));
-		g_pVGuiLocalize->ConstructString( szEtxraInfo,sizeof( szEtxraInfo ), g_pVGuiLocalize->Find("#Spec_Map" ),1, wMapName );
+		g_pVGuiLocalize->ConstructString_safe( szEtxraInfo, g_pVGuiLocalize->Find("#Spec_Map" ),1, wMapName );
 
 		g_pVGuiLocalize->ConvertANSIToUnicode( "" ,szTitleLabel,sizeof(szTitleLabel));
 	}
 
 	SetLabelText("extrainfo", szEtxraInfo );
 	SetLabelText("titlelabel", szTitleLabel );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Gets the res file we should use (depends on if we're in Steam Controller mode)
+//-----------------------------------------------------------------------------
+const char * CSpectatorGUI::GetResFile( void )
+{
+	if ( ::input->IsSteamControllerActive() )
+	{
+		return "Resource/UI/Spectator_SC.res";
+	}
+	else
+	{
+		return "Resource/UI/Spectator.res";
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -729,6 +777,7 @@ static void ForwardSpecCmdToServer( const CCommand &args )
 	else if ( args.ArgC() == 2 )
 	{
 		// forward the command with parameter
+		// XXX(JohnS): Whyyyyy
 		char command[128];
 		Q_snprintf( command, sizeof(command), "%s \"%s\"", args[ 0 ], args[ 1 ] );
 		engine->ServerCmd( command );
@@ -826,7 +875,7 @@ CON_COMMAND_F( spec_mode, "Set spectator mode", FCVAR_CLIENTCMD_CAN_EXECUTE )
 	}
 }
 
-CON_COMMAND_F( spec_player, "Spectate player by name", FCVAR_CLIENTCMD_CAN_EXECUTE )
+CON_COMMAND_F( spec_player, "Spectate player by partial name, steamid, or userid", FCVAR_CLIENTCMD_CAN_EXECUTE )
 {
 	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
 
@@ -834,14 +883,17 @@ CON_COMMAND_F( spec_player, "Spectate player by name", FCVAR_CLIENTCMD_CAN_EXECU
 		return;
 
 	if ( args.ArgC() != 2 )
+	{
+		ConMsg( "Usage: spec_player { steamid | #userid | partial name match }\n" );
 		return;
+	}
 
 	if ( engine->IsHLTV() )
 	{
 		// we can only switch primary spectator targets is PVS isnt locked by auto-director
 		if ( !HLTVCamera()->IsPVSLocked() )
 		{
-			HLTVCamera()->SpecNamedPlayer( args[1] );
+			HLTVCamera()->SpecPlayerByPredicate( args[1] );
 		}
 	}
 	else

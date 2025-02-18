@@ -336,7 +336,6 @@ void CHudAmmo::Paint( void )
 {
 	BaseClass::Paint();
 
-#ifndef HL2MP
 	if ( m_hCurrentVehicle == NULL && m_iconPrimaryAmmo )
 	{
 		int nLabelHeight;
@@ -349,7 +348,6 @@ void CHudAmmo::Paint( void )
 		
 		m_iconPrimaryAmmo->DrawSelf( x, y, GetFgColor() );
 	}
-#endif // HL2MP
 }
 
 //-----------------------------------------------------------------------------
@@ -373,7 +371,6 @@ public:
 
 	void Init( void )
 	{
-#ifndef HL2MP
 		wchar_t *tempString = g_pVGuiLocalize->Find("#Valve_Hud_AMMO_ALT");
 		if (tempString)
 		{
@@ -383,7 +380,6 @@ public:
 		{
 			SetLabelText(L"ALT");
 		}
-#endif // HL2MP
 	}
 
 	void VidInit( void )
@@ -428,7 +424,6 @@ public:
 	{
 		BaseClass::Paint();
 
-#ifndef HL2MP
 		if ( m_iconSecondaryAmmo )
 		{
 			int nLabelHeight;
@@ -441,7 +436,6 @@ public:
 
 			m_iconSecondaryAmmo->DrawSelf( x, y, GetFgColor() );
 		}
-#endif // HL2MP
 	}
 
 protected:
