@@ -21,7 +21,7 @@ void CPointEntity::Spawn( void )
 //	UTIL_SetSize(this, vec3_origin, vec3_origin);
 }
 
-#ifndef LUA_SDK
+#ifndef HL2SB
 class CNullEntity : public CBaseEntity
 #else
 // @ThePixelMoon: https://github.com/Nbc66/source-sdk-2013-ce/commit/ea63e94dc70fa0016eff8e05dd927bb421f8ece7
