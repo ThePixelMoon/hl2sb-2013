@@ -25,7 +25,10 @@ C_ScriptedBaseGameUIPanel *g_pScriptedBaseGameUIPanel = NULL;
 //-----------------------------------------------------------------------------
 void VGUI_CreateGameUIRootPanel( void )
 {
-	g_pScriptedBaseGameUIPanel = new C_ScriptedBaseGameUIPanel( enginevgui->GetPanel( PANEL_GAMEUIDLL ) );
+	// @ThePixelMoon: https://github.com/ThePixelMoon/OpenMod/commit/a19a0ba86d634402690f334b9666e18b1aa23c2b
+	//				  Weird, this fix was the only thing to make this whole thing work. Maybe i was the only one
+	//				  to experience that bug? Dunno.
+	g_pScriptedBaseGameUIPanel = new C_ScriptedBaseGameUIPanel( enginevgui->GetPanel( PANEL_ROOT ) );
 }
 
 //-----------------------------------------------------------------------------
