@@ -2161,8 +2161,15 @@ void CBaseFlex::DoBodyLean( void )
 		{
 			m_vecPrevVelocity = vecDelta;
 			float decay =  ExponentialDecay( 0.5, 0.1, dt );
+#ifdef HL2SB
+			// @ThePixelMoon: https://github.com/Nbc66/source-sdk-2013-ce/commit/53dc5d97ee03d356a0feaae96cda1590d6607e6c
+			// Minor fix from the Alien Swarm SDK.
+			m_vecShift *= decay;
+			m_vecLean *= decay;
+#else
 			m_vecShift = m_vecLean * decay;
 			m_vecLean = m_vecShift * decay;
+#endif // HL2SB
  		}
 
 		m_vecPrevOrigin = vecOrigin;
