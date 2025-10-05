@@ -21,11 +21,20 @@ void CPointEntity::Spawn( void )
 //	UTIL_SetSize(this, vec3_origin, vec3_origin);
 }
 
-
+#ifndef LUA_SDK
 class CNullEntity : public CBaseEntity
+#else
+// @ThePixelMoon: https://github.com/Nbc66/source-sdk-2013-ce/commit/ea63e94dc70fa0016eff8e05dd927bb421f8ece7
+class CNullEntity : public CServerOnlyEntity
+#endif
 {
 public:
+#ifndef HL2SB
 	DECLARE_CLASS( CNullEntity, CBaseEntity );
+#else
+	// @ThePixelMoon: https://github.com/Nbc66/source-sdk-2013-ce/commit/ea63e94dc70fa0016eff8e05dd927bb421f8ece7
+	DECLARE_CLASS( CNullEntity, CServerOnlyEntity );
+#endif
 
 	void Spawn( void );
 };
