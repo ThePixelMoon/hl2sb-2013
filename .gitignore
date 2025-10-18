@@ -54,7 +54,6 @@ config.cfg
 # shader files
 *.tmp
 
-*.lib
 .vs
 Debug*/
 Release*/
@@ -509,3 +508,45 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+
+*_linux64
+*_win64.exe
+!game/bin/linux64/libsteamapi.so
+!game/bin/x64/steam_api64.dll
+!src/devtools/bin
+!src/lib/public/x64
+!src/lib/common/x64
+!src/thirdparty/protobuf-2.6.1/bin
+!src/thirdparty/protobuf-2.6.1/bin/win64
+!src/thirdparty/protobuf-2.6.1/bin/win64/2015
+!src/thirdparty/protobuf-2.6.1/bin/win64/2015/staticcrt
+!src/thirdparty/protobuf-2.6.1/bin/win64/2015/staticcrt/debug
+!src/thirdparty/protobuf-2.6.1/bin/win64/2015/staticcrt/release
+.vscode/
+compile_commands.json
+.ninja_deps
+.ninja_log
+
+mathlib.a
+mathlib.lib
+matsys_controls.a
+matsys_controls.lib
+raytrace.a
+raytrace.lib
+tier1.a
+tier1.lib
+vgui_controls.a
+vgui_controls.lib
+
+ServerConfig.vdf
+server_blacklist.txt
+settings.scr
+*shaders.cfg
+graphs/
+stats.txt
+videoconfig_*.cfg
+steam_appid.txt
+voice_ban.dt
+*.o
+!src/luajit/src/lj_vm.S
