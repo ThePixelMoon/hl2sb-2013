@@ -175,7 +175,9 @@ extern vgui::IInputInternal *g_InputInternal;
 
 #ifdef LUA_SDK
 #include "luamanager.h"
+#ifdef _WIN32
 #include "luacachefile.h"
+#endif
 #include "mountaddons.h"
 #endif
 
@@ -1678,6 +1680,7 @@ void CHLClient::LevelInitPreEntity( char const* pMapName )
 	g_bLevelInitialized = true;
 
 #if defined ( LUA_SDK )
+#ifdef _WIN32
 	lcf_recursivedeletefile( LUA_PATH_CACHE );
 
 	// Add the Lua environment.
@@ -1686,6 +1689,7 @@ void CHLClient::LevelInitPreEntity( char const* pMapName )
 	{
 		luasrc_ExtractLcf();
 	}
+#endif
 
 	luasrc_init();
 

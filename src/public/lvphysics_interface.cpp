@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2005, Valve Corporation, All rights reserved. ============//
+//========= Copyright ï¿½ 1996-2005, Valve Corporation, All rights reserved. ============//
 //
 // Purpose: Public interfaces to vphysics DLL
 //
@@ -592,7 +592,8 @@ static int physenv_SetGravity (lua_State *L) {
 }
 
 static int physenv_SetPerformanceSettings (lua_State *L) {
-  physenv->SetPerformanceSettings(&lua_toperformanceparams(L, 1));
+  lua_Physics_performanceparams_t params = lua_toperformanceparams(L, 1);
+  physenv->SetPerformanceSettings(&params);
   return 0;
 }
 

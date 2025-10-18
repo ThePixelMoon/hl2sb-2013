@@ -853,15 +853,15 @@ $Project
 			$File	"$SRCDIR\game\shared\lsrcinit.cpp"
 			$File	"$SRCDIR\game\shared\ltakedamageinfo.cpp"
 			$File	"$SRCDIR\game\shared\ltakedamageinfo.h"
-			$File	"$SRCDIR\game\shared\luacachefile.cpp"
-			$File	"$SRCDIR\game\shared\luacachefile.h"
+			$File	"$SRCDIR\game\shared\luacachefile.cpp" [$WINDOWS]
+			$File	"$SRCDIR\game\shared\luacachefile.h" [$WINDOWS]
 			$File	"$SRCDIR\game\shared\luamanager.cpp"
 			$File	"$SRCDIR\game\shared\luamanager.h"
 			$File	"$SRCDIR\game\shared\luasrclib.h"
 			$File	"$SRCDIR\game\shared\lutil_shared.cpp"
 			$File	"$SRCDIR\game\shared\mountaddons.cpp"
 			$File	"$SRCDIR\game\shared\mountaddons.h"
-			$File	"$SRCDIR\public\XUnzip_src.cpp"
+			$File	"$SRCDIR\public\XUnzip_src.cpp" [$WINDOWS]
 			$File	"$SRCDIR\public\engine\livdebugoverlay.cpp"
 			$File	"$SRCDIR\public\lColor.cpp"
 			$File	"$SRCDIR\public\lColor.h"

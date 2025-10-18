@@ -1,4 +1,4 @@
-//====== Copyright © 1996-2005, Valve Corporation, All rights reserved. =======//
+//====== Copyright ï¿½ 1996-2005, Valve Corporation, All rights reserved. =======//
 //
 // Purpose: 
 //
@@ -41,7 +41,7 @@ LUA_API lua_QAngle &lua_toangle (lua_State *L, int idx) {
 */
 
 
-LUA_API void lua_pushvector (lua_State *L, lua_Vector &v) {
+LUA_API void lua_pushvector (lua_State *L, const lua_Vector &v) {
   lua_Vector *pVec = (lua_Vector *)lua_newuserdata(L, sizeof(lua_Vector));
   *pVec = v;
   luaL_getmetatable(L, "Vector");
@@ -49,7 +49,7 @@ LUA_API void lua_pushvector (lua_State *L, lua_Vector &v) {
 }
 
 
-LUA_API void lua_pushangle (lua_State *L, lua_QAngle &v) {
+LUA_API void lua_pushangle (lua_State *L, const lua_QAngle &v) {
   lua_QAngle *pVec = (lua_QAngle *)lua_newuserdata(L, sizeof(lua_QAngle));
   *pVec = v;
   luaL_getmetatable(L, "QAngle");

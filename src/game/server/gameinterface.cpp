@@ -131,7 +131,9 @@ extern ConVar tf_mm_servermode;
 
 #ifdef LUA_SDK
 #include "luamanager.h"
+#ifdef _WIN32
 #include "luacachefile.h"
+#endif
 #include "mountaddons.h"
 #endif
 
@@ -985,7 +987,9 @@ bool CServerGameDLL::LevelInit( const char *pMapName, char const *pMapEntities, 
 	g_flServerCurTime = gpGlobals->curtime;
 
 #ifdef LUA_SDK
+#ifdef _WIN32
 	lcf_recursivedeletefile( LUA_PATH_CACHE );
+#endif
 
 	// Add Lua environment
 	luasrc_init();
@@ -1005,11 +1009,13 @@ bool CServerGameDLL::LevelInit( const char *pMapName, char const *pMapEntities, 
 	luasrc_LoadGamemode( gamemode.GetString() );
 	luasrc_SetGamemode( gamemode.GetString() );
 
+#ifdef _WIN32
 	if ( gpGlobals->maxClients > 1 )
 	{
 		// load LCF into stringtable
 		lcf_preparecachefile();
 	}
+#endif
 #endif
 
 #ifdef USES_ECON_ITEMS

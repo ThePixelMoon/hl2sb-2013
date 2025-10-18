@@ -18,7 +18,9 @@
 #include "weapon_hl2mpbase_scriptedweapon.h"
 #include "luamanager.h"
 #include "luasrclib.h"
+#ifdef _WIN32
 #include "luacachefile.h"
+#endif
 #include "lconvar.h"
 #include "licvar.h"
 
@@ -217,7 +219,9 @@ void luasrc_init (void) {
 
   luaL_openlibs(L);
   base_open(L);
+#ifdef _WIN32
   lcf_open(L);
+#endif
 
   // Andrew; Someone set us up the path for great justice
   luasrc_setmodulepaths(L);
@@ -246,7 +250,9 @@ void luasrc_shutdown (void) {
   ResetEntityFactoryDatabase();
   ResetWeaponFactoryDatabase();
 
+#ifdef _WIN32
   lcf_close(L);
+#endif
   lua_close(L);
 }
 

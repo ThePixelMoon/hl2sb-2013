@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2005, Valve Corporation, All rights reserved. ============//
+//========= Copyright ï¿½ 1996-2005, Valve Corporation, All rights reserved. ============//
 //
 // Purpose: Implements shared baseplayer class functionality
 //
@@ -494,8 +494,14 @@ static int CBasePlayer_PlayerUse (lua_State *L) {
   return 0;
 }
 
-static int CBasePlayer_PlayStepSound (lua_State *L) {
-  luaL_checkplayer(L, 1)->PlayStepSound(luaL_checkvector(L, 2), &lua_tosurfacedata(L, 3), luaL_checknumber(L, 4), luaL_checkboolean(L, 5));
+static int CBasePlayer_PlayStepSound(lua_State *L) {
+  surfacedata_t sd = lua_tosurfacedata(L, 3);
+  luaL_checkplayer(L, 1)->PlayStepSound(
+      luaL_checkvector(L, 2),
+      &sd,
+      luaL_checknumber(L, 4),
+      luaL_checkboolean(L, 5)
+  );
   return 0;
 }
 
