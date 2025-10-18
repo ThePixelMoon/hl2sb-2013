@@ -141,17 +141,12 @@ class CHudVotePanel : public vgui::EditablePanel, public CGameEventListener
 {
 	DECLARE_CLASS_SIMPLE( CHudVotePanel, vgui::EditablePanel );
 
-<<<<<<< HEAD
-	CHudVote( const char *pElementName );
-	virtual ~CHudVote() {}
-=======
 public:
 	CHudVotePanel( vgui::Panel *pParent, int nIdx );
 
 	void			Init();
 	void			LevelInit();
 	bool 			ShouldDraw( void );
->>>>>>> 0759e2e8 (Add Team Fortress 2 SDK)
 
 	virtual void	ApplySchemeSettings( vgui::IScheme *pScheme );
 	virtual void	FireGameEvent( IGameEvent *event );

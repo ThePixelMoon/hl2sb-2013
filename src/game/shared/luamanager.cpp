@@ -1,4 +1,4 @@
-//===== Copyright © 1996-2005, Valve Corporation, All rights reserved. ======//
+//===== Copyright ï¿½ 1996-2005, Valve Corporation, All rights reserved. ======//
 //
 // Purpose: Contains the implementation of Lua for scripting.
 //
@@ -670,7 +670,7 @@ static int DoFileCompletion( const char *partial, char commands[ COMMAND_COMPLET
 	char WildCard[ MAX_PATH ] = { 0 };
 	if ( substring == NULL )
 		substring = "";
-	Q_snprintf( WildCard, sizeof( WildCard ), LUA_ROOT "\\%s*", substring );
+	Q_snprintf( WildCard, sizeof( WildCard ), LUA_ROOTPATH "\\%s*", substring );
 	Q_FixSlashes( WildCard );
 	char const *fn = g_pFullFileSystem->FindFirstEx( WildCard, "MOD", &fh );
 	while ( fn && current < COMMAND_COMPLETION_MAXITEMS )
@@ -678,7 +678,7 @@ static int DoFileCompletion( const char *partial, char commands[ COMMAND_COMPLET
 		if ( fn[0] != '.' )
 		{
 			char filename[ MAX_PATH ] = { 0 };
-			Q_snprintf( filename, sizeof( filename ), LUA_ROOT "\\%s\\%s", substring, fn );
+			Q_snprintf( filename, sizeof( filename ), LUA_ROOTPATH "\\%s\\%s", substring, fn );
 			Q_FixSlashes( filename );
 			if ( filesystem->FileExists( filename, "MOD" ) )
 			{
@@ -708,7 +708,7 @@ static int DoFileCompletion( const char *partial, char commands[ COMMAND_COMPLET
 
 		char fullpath[ 512 ] = { 0 };
 		char filename[ 256 ] = { 0 };
-		Q_snprintf( filename, sizeof( filename ), LUA_ROOT "\\%s", args.ArgS() );
+		Q_snprintf( filename, sizeof( filename ), LUA_ROOTPATH "\\%s", args.ArgS() );
 		Q_strlower( filename );
 		Q_FixSlashes( filename );
 		if ( filesystem->FileExists( filename, "MOD" ) )
@@ -717,7 +717,7 @@ static int DoFileCompletion( const char *partial, char commands[ COMMAND_COMPLET
 		}
 		else
 		{
-			Q_snprintf( fullpath, sizeof( fullpath ), "%s\\" LUA_ROOT "\\%s", engine->GetGameDirectory(), args.ArgS() );
+			Q_snprintf( fullpath, sizeof( fullpath ), "%s\\" LUA_ROOTPATH "\\%s", engine->GetGameDirectory(), args.ArgS() );
 			Q_strlower( fullpath );
 			Q_FixSlashes( fullpath );
 		}
@@ -746,7 +746,7 @@ static int DoFileCompletion( const char *partial, char commands[ COMMAND_COMPLET
 
 		char fullpath[ 512 ] = { 0 };
 		char filename[ 256 ] = { 0 };
-		Q_snprintf( filename, sizeof( filename ), LUA_ROOT "lua\\%s", args.ArgS() );
+		Q_snprintf( filename, sizeof( filename ), LUA_ROOTPATH "lua\\%s", args.ArgS() );
 		Q_strlower( filename );
 		Q_FixSlashes( filename );
 		if ( filesystem->FileExists( filename, "MOD" ) )
@@ -759,7 +759,7 @@ static int DoFileCompletion( const char *partial, char commands[ COMMAND_COMPLET
 			char gamePath[256];
 			engine->GetGameDir( gamePath, 256 );
 			Q_StripTrailingSlash( gamePath );
-			Q_snprintf( fullpath, sizeof( fullpath ), "%s\\" LUA_ROOT "\\%s", gamePath, args.ArgS() );
+			Q_snprintf( fullpath, sizeof( fullpath ), "%s\\" LUA_ROOTPATH "\\%s", gamePath, args.ArgS() );
 			Q_strlower( fullpath );
 			Q_FixSlashes( fullpath );
 		}
