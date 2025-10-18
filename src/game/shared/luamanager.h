@@ -14,6 +14,9 @@
 #ifdef LUA_SDK
 #include "lua.hpp"
 
+#define lua_unref(L, ref) luaL_unref(L, LUA_REGISTRYINDEX, ref)
+#define lua_getref(L, ref) lua_rawgeti(L, LUA_REGISTRYINDEX, ref)
+
 #define LUA_ROOTPATH					"lua" // Can't be "LUA_PATH" because luaconf.h uses it.
 #define LUA_PATH_CACHE				"lua_cache"
 #define LUA_PATH_ADDONS				"addons"

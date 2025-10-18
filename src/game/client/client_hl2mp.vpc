@@ -13,7 +13,7 @@ $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories		"$BASE;hl2mp\ui,.\hl2mp,$SRCDIR\game\shared\hl2mp,.\hl2,.\episodic,.\hl2\elements,$SRCDIR\game\shared\hl2,$SRCDIR\game\shared\episodic,$SRCDIR\thirdparty\lua-5.1.5\etc,$SRCDIR\thirdparty\lua-5.1.5\src"
+		$AdditionalIncludeDirectories		"$BASE;hl2mp\ui,.\hl2mp,$SRCDIR\game\shared\hl2mp,.\hl2,.\episodic,.\hl2\elements,$SRCDIR\game\shared\hl2,$SRCDIR\game\shared\episodic,$SRCDIR\thirdparty\luajit\src"
 		$PreprocessorDefinitions			"$BASE;HL2MP;HL2_CLIENT_DLL;HL2_EPISODIC;ARGG;LUA_SDK;HL2SB;NEXT_BOT"
 	}
 }

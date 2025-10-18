@@ -14,7 +14,7 @@ $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\game\shared\hl2,$SRCDIR\game\shared\episodic,.\hl2,.\episodic,.\hl2mp,$SRCDIR\game\shared\hl2mp,$SRCDIR\thirdparty\lua-5.1.5\etc,$SRCDIR\thirdparty\lua-5.1.5\src"
+		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\game\shared\hl2,$SRCDIR\game\shared\episodic,.\hl2,.\episodic,.\hl2mp,$SRCDIR\game\shared\hl2mp,$SRCDIR\thirdparty\luajit\src"
 		$PreprocessorDefinitions		"$BASE;HL2MP;HL2_DLL;HL2_EPISODIC;ARGG;LUA_SDK;HL2SB;NEXT_BOT"
 	}
 }
