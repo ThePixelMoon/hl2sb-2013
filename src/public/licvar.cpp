@@ -92,7 +92,8 @@ void InstallGlobalChangeCallbacks( void )
 void RemoveGlobalChangeCallbacks( void )
 {
 	// Remove the global cvar callback
-	cvar->RemoveGlobalChangeCallback( CV_GlobalChange_Lua );
+	if ( cvar )
+		cvar->RemoveGlobalChangeCallback( CV_GlobalChange_Lua );
 }
 
 
