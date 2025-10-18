@@ -5,8 +5,7 @@
 //-----------------------------------------------------------------------------
 
 $Macro SRCDIR		"..\.."
-$Macro GAMENAME 	"hl2sb" [!$SOURCESDK]
-$Macro GAMENAME 	"hl2sb" [$SOURCESDK]
+$Macro GAMENAME 	"hl2sb"
 
 $Include "$SRCDIR\game\server\server_base.vpc"
 $Include "$SRCDIR\game\server\nav_mesh.vpc"
