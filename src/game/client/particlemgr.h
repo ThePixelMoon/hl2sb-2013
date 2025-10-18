@@ -123,6 +123,7 @@ entities. Each one is useful under different conditions.
 #include <typeinfo.h>
 #else
 #include <typeinfo>
+#endif
 #include "tier1/utlintrusivelist.h"
 #include "tier1/utlstring.h"
 
@@ -914,5 +915,3 @@ inline void SwapParticles( Particle *pPrev, Particle *pCur )
 
 
 #endif
-
-
