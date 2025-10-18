@@ -1,6 +1,6 @@
-//===== Copyright © 1996-2005, Valve Corporation, All rights reserved. ======//
+//===== Copyright Â© 1996-2005, Valve Corporation, All rights reserved. ======//
 //
-// Purpose: 
+// Purpose:
 //
 // $Workfile:     $
 // $Date:         $
@@ -16,6 +16,7 @@
 #include "luasrclib.h"
 #include "lconvar.h"
 #include "lbaseplayer_shared.h"
+#include "datacache/imdlcache.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -166,7 +167,7 @@ void CC_ConCommand( const CCommand& args )
 	// if ( !pPlayer )
 	// 	return;
 
-	//MDLCACHE_CRITICAL_SECTION();
+	MDLCACHE_CRITICAL_SECTION();
 
 	lua_getglobal( L, "concommand" );
 	if ( lua_istable( L, -1 ) )
@@ -210,46 +211,54 @@ void CC_ConCommand( const CCommand& args )
 		lua_pop( L, 1 );
 }
 
-static int luasrc_ConCommand (lua_State *L) {
-  const char *pName = luaL_checkstring(L, 1);
+static int luasrc_ConCommand(lua_State* L) {
+	const char* pName = luaL_checkstring(L, 1);
 #ifdef CLIENT_DLL
-  bool bIsGameUI = false;
-  unsigned short lookup;
-  lua_getglobal(L, "_GAMEUI");
-  if (!lua_isnoneornil(L, -1) && lua_toboolean(L, -1)) {
-    bIsGameUI = true;
+	bool bIsGameUI = false;
+	unsigned short lookup;
+	lua_getglobal(L, "_GAMEUI");
+	if (!lua_isnoneornil(L, -1) && lua_toboolean(L, -1)) {
+		bIsGameUI = true;
 
-    // Complain about duplicately defined ConCommand names...
-    lookup = m_GameUIConCommandDatabase.Find( pName );
-    if ( lookup != m_GameUIConCommandDatabase.InvalidIndex() || cvar->FindCommand(pName) )
-    {
-      lua_pushconcommand(L, cvar->FindCommand(pName));
-      return 1;
-    }
-  } else {
+		// Complain about duplicately defined ConCommand names...
+		lookup = m_GameUIConCommandDatabase.Find(pName);
+		if (lookup != m_GameUIConCommandDatabase.InvalidIndex() || cvar->FindCommand(pName))
+		{
+			lua_pushconcommand(L, cvar->FindCommand(pName));
+			return 1;
+		}
+	}
+	else {
 #endif
-    // Complain about duplicately defined ConCommand names...
-    unsigned short lookup = m_ConCommandDatabase.Find( pName );
-    if ( lookup != m_ConCommandDatabase.InvalidIndex() || cvar->FindCommand(pName) )
-    {
-      lua_pushconcommand(L, cvar->FindCommand(pName));
-      return 1;
-    }
+		// Complain about duplicately defined ConCommand names...
+		unsigned short lookup = m_ConCommandDatabase.Find(pName);
+		if (lookup != m_ConCommandDatabase.InvalidIndex() || cvar->FindCommand(pName))
+		{
+			lua_pushconcommand(L, cvar->FindCommand(pName));
+			return 1;
+		}
 #ifdef CLIENT_DLL
-  }
+	}
 #endif
-  lua_pop(L, 1);
+	lua_pop(L, 1);
 
-  ConCommand *pConCommand;
+	ConCommand* pConCommand;
 #ifdef CLIENT_DLL
-  if (bIsGameUI)
+	if (bIsGameUI)
+	{
 #if 0
-    pConCommand = new ConCommand(strdup(pName), CC_GameUIConCommand, strdup(luaL_optstring(L, 2, 0)), luaL_optint(L, 3, 0), NULL);
+		pConCommand = new ConCommand(strdup(pName), CC_GameUIConCommand, strdup(luaL_optstring(L, 2, 0)), luaL_optint(L, 3, 0), NULL);
 #else
-    pConCommand = new ConCommand(strdup(pName), CC_GameUIConCommand, strdup(luaL_optstring(L, 2, 0)), 0, NULL);
+		const char* pNameS = luaL_optstring(L, 2, 0);
+		pConCommand = new ConCommand(strdup(pName), CC_GameUIConCommand, strdup(pNameS), 0, NULL);
 #endif
-  else
-    pConCommand = new ConCommand(strdup(pName), CC_ConCommand, strdup(luaL_optstring(L, 2, 0)), FCVAR_CLIENTDLL | FCVAR_CLIENTCMD_CAN_EXECUTE | FCVAR_SERVER_CAN_EXECUTE, NULL);
+	}
+	else
+	{
+
+	const char* pNameS = luaL_optstring(L, 2, 0);
+	pConCommand = new ConCommand(strdup(pName), CC_ConCommand, strdup(pNameS), FCVAR_CLIENTDLL | FCVAR_CLIENTCMD_CAN_EXECUTE | FCVAR_SERVER_CAN_EXECUTE, NULL);
+	}
 #else
 #if 0
     pConCommand = new ConCommand(strdup(pName), CC_ConCommand, strdup(luaL_optstring(L, 2, 0)), luaL_optint(L, 3, 0), NULL);
@@ -291,9 +300,7 @@ void ResetConCommandDatabase( void )
 	for ( int i=m_ConCommandDatabase.First(); i != m_ConCommandDatabase.InvalidIndex(); i=m_ConCommandDatabase.Next( i ) )
 	{
 		ConCommand *pConCommand = m_ConCommandDatabase[ i ];
-		if (cvar) {
-			cvar->UnregisterConCommand(pConCommand);
-		}
+		cvar->UnregisterConCommand(pConCommand);
 		delete pConCommand;
 	}
 	m_ConCommandDatabase.RemoveAll();
@@ -488,4 +495,3 @@ LUALIB_API int luaopen_ConVar (lua_State *L) {
   lua_pop(L, 1);
   return 1;
 }
-

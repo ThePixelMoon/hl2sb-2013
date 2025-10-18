@@ -1,6 +1,6 @@
-//===== Copyright © 1996-2005, Valve Corporation, All rights reserved. ======//
+//===== Copyright Â© 1996-2005, Valve Corporation, All rights reserved. ======//
 //
-// Purpose: 
+// Purpose:
 //
 //===========================================================================//
 
@@ -92,10 +92,7 @@ void InstallGlobalChangeCallbacks( void )
 void RemoveGlobalChangeCallbacks( void )
 {
 	// Remove the global cvar callback
-	if (cvar)
-	{
-		cvar->RemoveGlobalChangeCallback(CV_GlobalChange_Lua);
-	}
+	cvar->RemoveGlobalChangeCallback( CV_GlobalChange_Lua );
 }
 
 
@@ -107,4 +104,3 @@ LUALIB_API int luaopen_cvar (lua_State *L) {
   InstallGlobalChangeCallbacks();
   return 1;
 }
-

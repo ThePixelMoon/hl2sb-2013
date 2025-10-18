@@ -42,16 +42,21 @@ WeaponData
 				"font"		"WeaponIconsSelected"
 				"character"	"g"
 		}
+		"weapon_small"
+		{
+				"font"		"WeaponIconsSmall"
+				"character"	"g"
+		}
 		"ammo"
 		{
-				"font"		"WeaponIcons"
+				"font"		"WeaponIconsSmallSecondary"
 				"character"	"w"
 		}
 		"crosshair"
 		{
 				"font"		"Crosshairs"
 				"character"	"Q"
-		}		
+		}
 		"autoaim"
 		{
 			"file"		"sprites/crosshairs"
@@ -64,7 +69,7 @@ WeaponData
 		{
 				"font"		"Crosshairs"
 				"character"	"Q"
-		}		
+		}
 		"zoom_autoaim"
 		{
 			"file"		"sprites/crosshairs"
