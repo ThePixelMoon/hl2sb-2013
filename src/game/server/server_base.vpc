@@ -1139,6 +1139,7 @@ $Project
 		$Lib	particles
 		$Lib	tier2
 		$Lib	tier3
+		$Lib	lua51
 
 		$ImpLibexternal steam_api	[!$WIN64]
 		$ImpLibexternal steam_api64	[$WIN64]

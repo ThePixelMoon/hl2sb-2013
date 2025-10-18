@@ -1614,6 +1614,8 @@ CAmmoDef *GetAmmoDef()
 
 #endif
 
+	bool CHL2MPRules::FShouldSwitchWeapon( CBasePlayer *pPlayer, CBaseCombatWeapon *pWeapon )
+	{
 		if ( pPlayer->GetActiveWeapon() && pPlayer->IsNetClient() )
 		{
 			// Player has an active item, so let's check cl_autowepswitch.

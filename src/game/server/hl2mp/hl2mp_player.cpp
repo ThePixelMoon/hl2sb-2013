@@ -1686,7 +1686,7 @@ CBaseEntity* CHL2MP_Player::EntSelectSpawnPoint( void )
 	if ( pSpot )
 	{
 		CBaseEntity *ent = NULL;
-		for ( CEntitySphereQuery sphere( pSpot->GetAbsOrigin(), hl2mp_spawn_frag_fallback_radius.GetFloat() ); (ent = sphere.GetCurrentEntity()) != NULL; sphere.NextEntity() )
+		for ( CEntitySphereQuery sphere( pSpot->GetAbsOrigin(), 128 ); (ent = sphere.GetCurrentEntity()) != NULL; sphere.NextEntity() )
 		{
 			// if ent is a client, kill em (unless they are ourselves)
 			if ( ent->IsPlayer() && !(ent->edict() == player) )
@@ -1740,7 +1740,6 @@ ReturnSpot:
 
 	return pSpot;
 } 
-
 
 CON_COMMAND( timeleft, "prints the time remaining in the match" )
 {

@@ -338,7 +338,7 @@ void CWeaponAR2::SecondaryAttack( void )
 
 #ifdef HL2SB
 #ifndef CLIENT_DLL
-	CBasePlayer *pPlayer = ToBasePlayer( GetOwner() );
+	//CBasePlayer *pPlayer = ToBasePlayer( GetOwner() );
 	if( pPlayer )
 	{
 		pPlayer->RumbleEffect(RUMBLE_AR2_ALT_FIRE, 0, RUMBLE_FLAG_RESTART );

@@ -737,7 +737,7 @@ $Project
 			$File	"$SRCDIR\public\lbspflags.cpp"
 			$File	"$SRCDIR\public\lcdll_int.cpp"
 			$File	"$SRCDIR\public\lcmodel.h"
-			$File	"$SRCDIR\public\leiface.cpp"
+			//$File	"$SRCDIR\public\leiface.cpp"
 			$File	"$SRCDIR\public\lfilesystem.cpp"
 			$File	"$SRCDIR\public\lfilesystem.h"
 			$File	"$SRCDIR\public\lgametrace.cpp"
@@ -1387,6 +1387,7 @@ $Project
 		$Lib		tier3
 		$Lib		vgui_controls
 		$Lib		vtf
+		$Lib		lua51
 
 		$ImpLibexternal steam_api	[!$WIN64]
 		$ImpLibexternal steam_api64	[$WIN64]
