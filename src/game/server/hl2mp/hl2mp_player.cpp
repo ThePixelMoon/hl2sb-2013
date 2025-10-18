@@ -482,6 +482,7 @@ bool CHL2MP_Player::ValidatePlayerModel( const char *pModel )
 	return false;
 }
 
+#ifndef HL2SB
 ConVar hl2mp_allow_pickup( "hl2mp_allow_pickup", "0", FCVAR_GAMEDLL );
 
 void CHL2MP_Player::PickupObject( CBaseEntity* pObject, bool bLimitMassAndSize )
@@ -491,6 +492,7 @@ void CHL2MP_Player::PickupObject( CBaseEntity* pObject, bool bLimitMassAndSize )
 
 	return BaseClass::PickupObject( pObject, bLimitMassAndSize );
 }
+#endif
 
 void CHL2MP_Player::SetPlayerTeamModel( void )
 {

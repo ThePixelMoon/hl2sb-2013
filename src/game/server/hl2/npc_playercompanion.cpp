@@ -32,6 +32,9 @@
 #include <KeyValues.h>
 #include "physics_npc_solver.h"
 
+// @ThePixelMoon: god, forgive me for using this :sob:
+#include <cstdint>
+
 ConVar ai_debug_readiness("ai_debug_readiness", "0" );
 ConVar ai_use_readiness("ai_use_readiness", "1" ); // 0 = off, 1 = on, 2 = on for player squad only
 ConVar ai_readiness_decay( "ai_readiness_decay", "120" );// How many seconds it takes to relax completely
@@ -3588,7 +3591,10 @@ void CNPC_PlayerCompanion::InputClearAllOuputs( inputdata_t &inputdata )
 			typedescription_t *dataDesc = &dmap->dataDesc[i];
 			if ( ( dataDesc->fieldType == FIELD_CUSTOM ) && ( dataDesc->flags & FTYPEDESC_OUTPUT ) )
 			{
-				CBaseEntityOutput *pOutput = (CBaseEntityOutput *)((int)this + (int)dataDesc->fieldOffset[0]);
+				CBaseEntityOutput* pOutput = 
+					reinterpret_cast<CBaseEntityOutput*>(
+						reinterpret_cast<uintptr_t>(this) + dataDesc->fieldOffset[0]
+					);
 				pOutput->DeleteAllElements();
 				/*
 				int nConnections = pOutput->NumberOfElements();

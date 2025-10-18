@@ -904,7 +904,7 @@ $Project
 			$File	"$SRCDIR\public\vphysics\lperformance.cpp"
 			$File	"$SRCDIR\public\vphysics\lperformance.h"
 			$File	"$SRCDIR\public\vstdlib\lrandom.cpp"
-			$File	"$SRCDIR\public\zip_utils_src.cpp"
+			$File	"$SRCDIR\public\zip_utils_src.cpp" [$WINDOWS]
 		}
 
 	}

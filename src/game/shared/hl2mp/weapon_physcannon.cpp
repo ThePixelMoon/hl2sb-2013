@@ -45,18 +45,6 @@
 #include "weapon_physcannon.h"
 #include "debugoverlay_shared.h"
 
-#ifdef HL2SB
-#ifdef CLIENT_DLL
-enum PhysGunForce_t
-{
-	PHYSGUN_FORCE_DROPPED,	// Dropped by +USE
-	PHYSGUN_FORCE_THROWN,	// Thrown from +USE
-	PHYSGUN_FORCE_PUNTED,	// Punted by cannon
-	PHYSGUN_FORCE_LAUNCHED,	// Launched by cannon
-};
-#endif
-#endif
-
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -876,336 +864,7 @@ void PlayerPickupObject( CBasePlayer *pPlayer, CBaseEntity *pObject )
 
 //----------------------------------------------------------------------------------------------------------------------------------------------------------
 //  CInterpolatedValue class
-//----------------------------------------------------------------------------------------------------------------------------------------------------------
-
-#ifdef CLIENT_DLL
-
-//----------------------------------------------------------------------------------------------------------------------------------------------------------
-//  CPhysCannonEffect class
-//----------------------------------------------------------------------------------------------------------------------------------------------------------
-
-class CPhysCannonEffect
-{
-public:
-	CPhysCannonEffect( void ) : m_vecColor( 255, 255, 255 ), m_bVisible( true ), m_nAttachment( -1 ) {};
-
-	void SetAttachment( int attachment ) { m_nAttachment = attachment; }
-	int	GetAttachment( void ) const { return m_nAttachment; }
-
-	void SetVisible( bool visible = true ) { m_bVisible = visible; }
-	int IsVisible( void ) const { return m_bVisible; }
-
-	void SetColor( const Vector &color ) { m_vecColor = color; }
-	const Vector &GetColor( void ) const { return m_vecColor; }
-
-	bool SetMaterial(  const char *materialName )
-	{
-		m_hMaterial.Init( materialName, TEXTURE_GROUP_CLIENT_EFFECTS );
-		return ( m_hMaterial != NULL );
-	}
-
-	CMaterialReference &GetMaterial( void ) { return m_hMaterial; }
-
-	CInterpolatedValue &GetAlpha( void ) { return m_Alpha; }
-	CInterpolatedValue &GetScale( void ) { return m_Scale; }
-
-private:
-	CInterpolatedValue	m_Alpha;
-	CInterpolatedValue	m_Scale;
-
-	Vector				m_vecColor;
-	bool				m_bVisible;
-	int					m_nAttachment;
-	CMaterialReference	m_hMaterial;
-};
-
-//----------------------------------------------------------------------------------------------------------------------------------------------------------
-//  CPhysCannonEffectBeam class
-//----------------------------------------------------------------------------------------------------------------------------------------------------------
-
-class CPhysCannonEffectBeam
-{
-public:
-	CPhysCannonEffectBeam( void ) : m_pBeam( NULL ) {};
-
-	~CPhysCannonEffectBeam( void )
-	{
-		Release();
-	}
-
-	void Release( void )
-	{
-		if ( m_pBeam != NULL )
-		{
-			m_pBeam->flags = 0;
-			m_pBeam->die = gpGlobals->curtime - 1;
-			
-			m_pBeam = NULL;
-		}
-	}
-
-	void Init( int startAttachment, int endAttachment, CBaseEntity *pEntity, bool firstPerson )
-	{
-		if ( m_pBeam != NULL )
-			return;
-
-		BeamInfo_t beamInfo;
-
-		beamInfo.m_pStartEnt = pEntity;
-		beamInfo.m_nStartAttachment = startAttachment;
-		beamInfo.m_pEndEnt = pEntity;
-		beamInfo.m_nEndAttachment = endAttachment;
-		beamInfo.m_nType = TE_BEAMPOINTS;
-		beamInfo.m_vecStart = vec3_origin;
-		beamInfo.m_vecEnd = vec3_origin;
-		
-		beamInfo.m_pszModelName = ( firstPerson ) ? PHYSCANNON_BEAM_SPRITE_NOZ : PHYSCANNON_BEAM_SPRITE;
-		
-		beamInfo.m_flHaloScale = 0.0f;
-		beamInfo.m_flLife = 0.0f;
-		
-		if ( firstPerson )
-		{
-			beamInfo.m_flWidth = 0.0f;
-			beamInfo.m_flEndWidth = 4.0f;
-		}
-		else
-		{
-			beamInfo.m_flWidth = 0.5f;
-			beamInfo.m_flEndWidth = 2.0f;
-		}
-
-		beamInfo.m_flFadeLength = 0.0f;
-		beamInfo.m_flAmplitude = 16;
-		beamInfo.m_flBrightness = 255.0;
-		beamInfo.m_flSpeed = 150.0f;
-		beamInfo.m_nStartFrame = 0.0;
-		beamInfo.m_flFrameRate = 30.0;
-		beamInfo.m_flRed = 255.0;
-		beamInfo.m_flGreen = 255.0;
-		beamInfo.m_flBlue = 255.0;
-		beamInfo.m_nSegments = 8;
-		beamInfo.m_bRenderable = true;
-		beamInfo.m_nFlags = FBEAM_FOREVER;
-	
-		m_pBeam = beams->CreateBeamEntPoint( beamInfo );
-	}
-
-	void SetVisible( bool state = true )
-	{
-		if ( m_pBeam == NULL )
-			return;
-
-		m_pBeam->brightness = ( state ) ? 255.0f : 0.0f;
-	}
-
-private:
-	Beam_t	*m_pBeam;
-};
-
-#endif
-
-//----------------------------------------------------------------------------------------------------------------------------------------------------------
-//  CWeaponPhysCannon class
-//----------------------------------------------------------------------------------------------------------------------------------------------------------
-
-#ifdef CLIENT_DLL
-#define CWeaponPhysCannon C_WeaponPhysCannon
-#endif
-
-class CWeaponPhysCannon : public CBaseHL2MPCombatWeapon
-{
-public:
-	DECLARE_CLASS( CWeaponPhysCannon, CBaseHL2MPCombatWeapon );
-
-	DECLARE_NETWORKCLASS(); 
-	DECLARE_PREDICTABLE();
-
-	CWeaponPhysCannon( void );
-
-	void	Drop( const Vector &vecVelocity );
-	void	Precache();
-	virtual void	OnRestore();
-	virtual void	StopLoopingSounds();
-	virtual void	UpdateOnRemove(void);
-	void	PrimaryAttack();
-	void	SecondaryAttack();
-	void	WeaponIdle();
-	void	ItemPreFrame();
-	void	ItemPostFrame();
-
-	void	ForceDrop( void );
-	bool	DropIfEntityHeld( CBaseEntity *pTarget );	// Drops its held entity if it matches the entity passed in
-	CGrabController &GetGrabController() { return m_grabController; }
-
-	bool	CanHolster( void );
-	bool	Holster( CBaseCombatWeapon *pSwitchingTo = NULL );
-	bool	Deploy( void );
-
-	bool	HasAnyAmmo( void ) { return true; }
-
-	virtual void SetViewModel( void );
-	virtual const char *GetShootSound( int iIndex ) const;
-	
-#ifndef CLIENT_DLL
-	CNetworkQAngle	( m_attachedAnglesPlayerSpace );
-#else
-	QAngle m_attachedAnglesPlayerSpace;
-#endif
-
-	CNetworkVector	( m_attachedPositionObjectSpace );
-
-	CNetworkHandle( CBaseEntity, m_hAttachedObject );
-
-	EHANDLE m_hOldAttachedObject;
-
-protected:
-	enum FindObjectResult_t
-	{
-		OBJECT_FOUND = 0,
-		OBJECT_NOT_FOUND,
-		OBJECT_BEING_DETACHED,
-	};
-
-	void	DoEffect( int effectType, Vector *pos = NULL );
-
-	void	OpenElements( void );
-	void	CloseElements( void );
-
-	// Pickup and throw objects.
-	bool	CanPickupObject( CBaseEntity *pTarget );
-	void	CheckForTarget( void );
-	
-#ifndef CLIENT_DLL
-	bool	AttachObject( CBaseEntity *pObject, const Vector &vPosition );
-	FindObjectResult_t		FindObject( void );
-	CBaseEntity *FindObjectInCone( const Vector &vecOrigin, const Vector &vecDir, float flCone );
-#endif	// !CLIENT_DLL
-
-	void	UpdateObject( void );
-	void	DetachObject( bool playSound = true, bool wasLaunched = false );
-	void	LaunchObject( const Vector &vecDir, float flForce );
-	void	StartEffects( void );	// Initialize all sprites and beams
-	void	StopEffects( bool stopSound = true );	// Hide all effects temporarily
-	void	DestroyEffects( void );	// Destroy all sprites and beams
-
-	// Punt objects - this is pointing at an object in the world and applying a force to it.
-	void	PuntNonVPhysics( CBaseEntity *pEntity, const Vector &forward, trace_t &tr );
-	void	PuntVPhysics( CBaseEntity *pEntity, const Vector &forward, trace_t &tr );
-
-	// Velocity-based throw common to punt and launch code.
-#ifndef HL2SB
-	void	ApplyVelocityBasedForce( CBaseEntity *pEntity, const Vector &forward );
-#else
-	void	ApplyVelocityBasedForce( CBaseEntity *pEntity, const Vector &forward, const Vector &vecHitPos, PhysGunForce_t reason );
-#endif
-
-	// Physgun effects
-	void	DoEffectClosed( void );
-	void	DoEffectReady( void );
-	void	DoEffectHolding( void );
-	void	DoEffectLaunch( Vector *pos );
-	void	DoEffectNone( void );
-	void	DoEffectIdle( void );
-
-	// Trace length
-	float	TraceLength();
-
-	// Sprite scale factor 
-	float	SpriteScaleFactor();
-
-	float			GetLoadPercentage();
-	CSoundPatch		*GetMotorSound( void );
-
-	void	DryFire( void );
-	void	PrimaryFireEffect( void );
-
-#ifndef CLIENT_DLL
-	// What happens when the physgun picks up something 
-	void	Physgun_OnPhysGunPickup( CBaseEntity *pEntity, CBasePlayer *pOwner, PhysGunPickup_t reason );
-#endif	// !CLIENT_DLL
-
-#ifdef CLIENT_DLL
-
-	enum EffectType_t
-	{
-		PHYSCANNON_CORE = 0,
-		
-		PHYSCANNON_BLAST,
-
-		PHYSCANNON_GLOW1,	// Must be in order!
-		PHYSCANNON_GLOW2,
-		PHYSCANNON_GLOW3,
-		PHYSCANNON_GLOW4,
-		PHYSCANNON_GLOW5,
-		PHYSCANNON_GLOW6,
-
-		PHYSCANNON_ENDCAP1,	// Must be in order!
-		PHYSCANNON_ENDCAP2,
-		PHYSCANNON_ENDCAP3,	// Only used in third-person!
-
-		NUM_PHYSCANNON_PARAMETERS	// Must be last!
-	};
-
-#define	NUM_GLOW_SPRITES ((CWeaponPhysCannon::PHYSCANNON_GLOW6-CWeaponPhysCannon::PHYSCANNON_GLOW1)+1)
-#define NUM_ENDCAP_SPRITES ((CWeaponPhysCannon::PHYSCANNON_ENDCAP3-CWeaponPhysCannon::PHYSCANNON_ENDCAP1)+1)
-
-#define	NUM_PHYSCANNON_BEAMS	3
-
-	virtual int		DrawModel( int flags );
-	virtual void	ViewModelDrawn( C_BaseViewModel *pBaseViewModel );
-	virtual bool	IsTransparent( void );
-	virtual void	OnDataChanged( DataUpdateType_t type );
-	virtual void	ClientThink( void );
-	
-	void			ManagePredictedObject( void );
-	void			DrawEffects( void );
-	void			GetEffectParameters( EffectType_t effectID, color32 &color, float &scale, IMaterial **pMaterial, Vector &vecAttachment );
-	void			DrawEffectSprite( EffectType_t effectID );
-	inline bool		IsEffectVisible( EffectType_t effectID );
-	void			UpdateElementPosition( void );
-
-	// We need to render opaque and translucent pieces
-	RenderGroup_t	GetRenderGroup( void ) {	return RENDER_GROUP_TWOPASS;	}
-
-	CInterpolatedValue		m_ElementParameter;							// Used to interpolate the position of the articulated elements
-	CPhysCannonEffect		m_Parameters[NUM_PHYSCANNON_PARAMETERS];	// Interpolated parameters for the effects
-	CPhysCannonEffectBeam	m_Beams[NUM_PHYSCANNON_BEAMS];				// Beams
-
-	int				m_nOldEffectState;	// Used for parity checks
-	bool			m_bOldOpen;			// Used for parity checks
-
-	void			NotifyShouldTransmit( ShouldTransmitState_t state );
-
-#endif	// CLIENT_DLL
-
-	int		m_nChangeState;				// For delayed state change of elements
-	float	m_flCheckSuppressTime;		// Amount of time to suppress the checking for targets
-	bool	m_flLastDenySoundPlayed;	// Debounce for deny sound
-	int		m_nAttack2Debounce;
-
-	CNetworkVar( bool,	m_bActive );
-	CNetworkVar( int,	m_EffectState );		// Current state of the effects on the gun
-	CNetworkVar( bool,	m_bOpen );
-
-	bool	m_bResetOwnerEntity;
-	
-	float	m_flElementDebounce;
-
-	CSoundPatch			*m_sndMotor;		// Whirring sound for the gun
-	
-	CGrabController		m_grabController;
-
-	float	m_flRepuntObjectTime;
-	EHANDLE m_hLastPuntedObject;
-
-private:
-	CWeaponPhysCannon( const CWeaponPhysCannon & );
-
-#ifndef CLIENT_DLL
-	DECLARE_ACTTABLE();
-#endif
-};
+//---------------------------------------------------------------------------------------------------------------------------------------------------------
 
 IMPLEMENT_NETWORKCLASS_ALIASED( WeaponPhysCannon, DT_WeaponPhysCannon )
 
@@ -1241,10 +900,25 @@ END_PREDICTION_DATA()
 LINK_ENTITY_TO_CLASS( weapon_physcannon, CWeaponPhysCannon );
 PRECACHE_WEAPON_REGISTER( weapon_physcannon );
 
-#ifndef CLIENT_DLL
+#if !defined( CLIENT_DLL ) || defined( VT_BASE )
 
 acttable_t	CWeaponPhysCannon::m_acttable[] = 
 {
+#ifdef VT_BASE
+	{ ACT_MP_STAND_IDLE,				ACT_HL2MP_IDLE_PHYSGUN,					false },
+	{ ACT_MP_CROUCH_IDLE,				ACT_HL2MP_IDLE_CROUCH_PHYSGUN,			false },
+
+	{ ACT_MP_RUN,						ACT_HL2MP_RUN_PHYSGUN,					false },
+	{ ACT_MP_CROUCHWALK,				ACT_HL2MP_WALK_CROUCH_PHYSGUN,			false },
+
+	{ ACT_MP_ATTACK_STAND_PRIMARYFIRE,	ACT_HL2MP_GESTURE_RANGE_ATTACK_PHYSGUN,	false },
+	{ ACT_MP_ATTACK_CROUCH_PRIMARYFIRE,	ACT_HL2MP_GESTURE_RANGE_ATTACK_PHYSGUN,	false },
+
+	{ ACT_MP_RELOAD_STAND,				ACT_HL2MP_GESTURE_RELOAD_PHYSGUN,		false },
+	{ ACT_MP_RELOAD_CROUCH,				ACT_HL2MP_GESTURE_RELOAD_PHYSGUN,		false },
+
+	{ ACT_MP_JUMP,						ACT_HL2MP_JUMP_PHYSGUN,					false },
+#else
 	{ ACT_HL2MP_IDLE,					ACT_HL2MP_IDLE_PHYSGUN,					false },
 	{ ACT_HL2MP_RUN,					ACT_HL2MP_RUN_PHYSGUN,					false },
 	{ ACT_HL2MP_IDLE_CROUCH,			ACT_HL2MP_IDLE_CROUCH_PHYSGUN,			false },
@@ -1252,6 +926,7 @@ acttable_t	CWeaponPhysCannon::m_acttable[] =
 	{ ACT_HL2MP_GESTURE_RANGE_ATTACK,	ACT_HL2MP_GESTURE_RANGE_ATTACK_PHYSGUN,	false },
 	{ ACT_HL2MP_GESTURE_RELOAD,			ACT_HL2MP_GESTURE_RELOAD_PHYSGUN,		false },
 	{ ACT_HL2MP_JUMP,					ACT_HL2MP_JUMP_PHYSGUN,					false },
+#endif // VT_BASE
 };
 
 IMPLEMENT_ACTTABLE(CWeaponPhysCannon);
@@ -1672,33 +1347,30 @@ void CWeaponPhysCannon::PuntVPhysics( CBaseEntity *pEntity, const Vector &vecFor
 				}
 				float mass = MIN(totalMass, maxMass); // max 250kg of additional force
 
-			// Put some spin on the object
-			for ( i = 0; i < listCount; i++ )
-			{
-				const float hitObjectFactor = 0.5f;
-				const float otherObjectFactor = 1.0f - hitObjectFactor;
-  				// Must be light enough
-				float ratio = pList[i]->GetMass() / totalMass;
-				if ( pList[i] == pEntity->VPhysicsGetObject() )
+				// Put some spin on the object
+				for ( i = 0; i < listCount; i++ )
 				{
-					ratio += hitObjectFactor;
-					ratio = MIN(ratio,1.0f);
+					const float hitObjectFactor = 0.5f;
+					const float otherObjectFactor = 1.0f - hitObjectFactor;
+  					// Must be light enough
+					float ratio = pList[i]->GetMass() / totalMass;
+					if ( pList[i] == pEntity->VPhysicsGetObject() )
+					{
+						ratio += hitObjectFactor;
+						ratio = MIN(ratio,1.0f);
+					}
+					else
+					{
+						ratio *= otherObjectFactor;
+					}
+  					pList[i]->ApplyForceCenter( forward * 15000.0f * ratio );
+  					pList[i]->ApplyForceOffset( forward * mass * 600.0f * ratio, tr.endpos );
 				}
-				else
-				{
-					ratio *= otherObjectFactor;
-				}
-  				pList[i]->ApplyForceCenter( forward * 15000.0f * ratio );
-  				pList[i]->ApplyForceOffset( forward * mass * 600.0f * ratio, tr.endpos );
 			}
-		}
-		else
-		{
-#ifndef HL2SB
-			ApplyVelocityBasedForce( pEntity, vecForward );
-#else
-			ApplyVelocityBasedForce( pEntity, vecForward, tr.endpos, PHYSGUN_FORCE_PUNTED );
-#endif
+			else
+			{
+				ApplyVelocityBasedForce( pEntity, vecForward );
+			}
 		}
 	}
 
@@ -1732,13 +1404,8 @@ void CWeaponPhysCannon::PuntVPhysics( CBaseEntity *pEntity, const Vector &vecFor
 //			ASSUMES: that pEntity is a vphysics entity.
 // Input  : - 
 //-----------------------------------------------------------------------------
-#ifndef HL2SB
 void CWeaponPhysCannon::ApplyVelocityBasedForce( CBaseEntity *pEntity, const Vector &forward )
-#else
-void CWeaponPhysCannon::ApplyVelocityBasedForce( CBaseEntity *pEntity, const Vector &forward, const Vector &vecHitPos, PhysGunForce_t reason )
-#endif
 {
-#ifndef HL2SB
 #ifndef CLIENT_DLL
 	IPhysicsObject *pPhysicsObject = pEntity->VPhysicsGetObject();
 	Assert(pPhysicsObject); // Shouldn't ever get here with a non-vphysics object.
@@ -1764,58 +1431,6 @@ void CWeaponPhysCannon::ApplyVelocityBasedForce( CBaseEntity *pEntity, const Vec
 
 #endif
 
-#else
-#ifndef CLIENT_DLL
-	// Get the launch velocity
-	Vector vVel = Pickup_PhysGunLaunchVelocity( pEntity, forward, reason );
-	
-	// Get the launch angular impulse
-	AngularImpulse aVel = Pickup_PhysGunLaunchAngularImpulse( pEntity, reason );
-		
-	// Get the physics object (MUST have one)
-	IPhysicsObject *pPhysicsObject = pEntity->VPhysicsGetObject();
-	if ( pPhysicsObject == NULL )
-	{
-		Assert( 0 );
-		return;
-	}
-
-	// Affect the object
-	CRagdollProp *pRagdoll = dynamic_cast<CRagdollProp*>( pEntity );
-	if ( pRagdoll == NULL )
-	{
-#ifdef HL2_EPISODIC
-		// The jeep being punted needs special force overrides
-		if ( reason == PHYSGUN_FORCE_PUNTED && pEntity->GetServerVehicle() )
-		{
-			// We want the point to emanate low on the vehicle to move it along the ground, not to twist it
-			Vector vecFinalPos = vecHitPos;
-			vecFinalPos.z = pEntity->GetAbsOrigin().z;
-			pPhysicsObject->ApplyForceOffset( vVel, vecFinalPos );
-		}
-		else
-		{
-			pPhysicsObject->AddVelocity( &vVel, &aVel );
-		}
-#else
-
-		pPhysicsObject->AddVelocity( &vVel, &aVel );
-
-#endif // HL2_EPISODIC
-	}
-	else
-	{
-		Vector	vTempVel;
-		AngularImpulse vTempAVel;
-
-		ragdoll_t *pRagdollPhys = pRagdoll->GetRagdoll( );
-		for ( int j = 0; j < pRagdollPhys->listCount; ++j )
-		{
-			pRagdollPhys->list[j].pObject->AddVelocity( &vVel, &aVel ); 
-		}
-	}
-#endif
-#endif
 }
 
 
@@ -2636,6 +2251,29 @@ void CWeaponPhysCannon::DoEffectIdle( void )
 
 	StartEffects();
 
+#ifdef VT_BASE
+	// Turn on the glow sprites
+	for ( int i = PHYSCANNON_GLOW1; i < (PHYSCANNON_GLOW1+NUM_GLOW_SPRITES); i++ )
+	{
+		m_Parameters[i].GetScale().SetAbsolute( random->RandomFloat( 0.075f, 0.05f ) * SPRITE_SCALE );
+		m_Parameters[i].GetAlpha().SetAbsolute( random->RandomInt( 24, 32 ) );
+	}
+
+	// Turn on the glow sprites
+	for ( int i = PHYSCANNON_ENDCAP1; i < (PHYSCANNON_ENDCAP1+NUM_ENDCAP_SPRITES); i++ )
+	{
+		m_Parameters[i].GetScale().SetAbsolute( random->RandomFloat( 3, 5 ) );
+		m_Parameters[i].GetAlpha().SetAbsolute( random->RandomInt( 200, 255 ) );
+	}
+
+	if ( m_EffectState != EFFECT_HOLDING )
+	{
+		// Turn beams off
+		m_Beams[0].SetVisible( false );
+		m_Beams[1].SetVisible( false );
+		m_Beams[2].SetVisible( false );
+	}
+#else
 	//if ( ShouldDrawUsingViewModel() )
 	{
 		// Turn on the glow sprites
@@ -2686,6 +2324,7 @@ void CWeaponPhysCannon::DoEffectIdle( void )
 		}
 	}
 	*/
+#endif // VT_BASE
 #endif
 }
 
@@ -2772,33 +2411,8 @@ void CWeaponPhysCannon::LaunchObject( const Vector &vecDir, float flForce )
 			m_hLastPuntedObject = pObject;
 			m_flRepuntObjectTime = gpGlobals->curtime + 0.5f;
 
-#ifndef HL2SB
 			// Launch
 			ApplyVelocityBasedForce( pObject, vecDir );
-#else
-			// Trace ahead a bit and make a chain of danger sounds ahead of the phys object
-			// to scare potential targets
-			trace_t	tr;
-			Vector	vecStart = pObject->GetAbsOrigin();
-			Vector	vecSpot;
-			int		iLength;
-			int		i;
-
-			UTIL_TraceLine( vecStart, vecStart + vecDir * flForce, MASK_SHOT, pObject, COLLISION_GROUP_NONE, &tr );
-			iLength = ( tr.startpos - tr.endpos ).Length();
-			vecSpot = vecStart + vecDir * PHYSCANNON_DANGER_SOUND_RADIUS;
-
-			for( i = PHYSCANNON_DANGER_SOUND_RADIUS ; i < iLength ; i += PHYSCANNON_DANGER_SOUND_RADIUS )
-			{
-#ifndef CLIENT_DLL
-				CSoundEnt::InsertSound( SOUND_PHYSICS_DANGER, vecSpot, PHYSCANNON_DANGER_SOUND_RADIUS, 0.5, pObject );
-#endif
-				vecSpot = vecSpot + ( vecDir * PHYSCANNON_DANGER_SOUND_RADIUS );
-			}
-					
-			// Launch
-			ApplyVelocityBasedForce( pObject, vecDir, tr.endpos, PHYSGUN_FORCE_LAUNCHED );
-#endif
 
 			// Don't allow the gun to regrab a thrown object!!
 			m_flNextSecondaryAttack = m_flNextPrimaryAttack = gpGlobals->curtime + 0.5;
@@ -3020,6 +2634,18 @@ void CWeaponPhysCannon::StopEffects( bool stopSound )
 		(CSoundEnvelopeController::GetController()).SoundFadeOut( GetMotorSound(), 0.1f );
 	}
 }
+
+#ifdef VT_BASE
+#ifdef CLIENT_DLL
+void CWeaponPhysCannon::ThirdPersonSwitch( bool bThirdPerson )
+{
+	//Tony; if we switch to first or third person or whatever, destroy and recreate the effects.
+	//Note: the sound only ever gets shut off on the server, so it's okay - as this is entirely client side.
+	DestroyEffects();
+	StartEffects();
+}
+#endif
+#endif // VT_BASE
 
 //-----------------------------------------------------------------------------
 // Purpose: 

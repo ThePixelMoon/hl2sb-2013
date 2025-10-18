@@ -8,7 +8,7 @@
 #include "vgui_int.h"
 #include "ienginevgui.h"
 #ifdef LUA_SDK
-#include "vgui/IVgui.h"
+#include "vgui/LVGUI.h"
 #include "vgui_rootpanel_hl2.h"
 #include "clientmode_shared.h"
 #endif

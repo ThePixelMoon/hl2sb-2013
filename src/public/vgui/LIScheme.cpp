@@ -8,12 +8,12 @@
 #define LIScheme_cpp
 
 #include "cbase.h"
-#include "vgui/ischeme.h"
+#include "vgui/IScheme.h"
 #include "vgui_controls/Controls.h"
 #include "luamanager.h"
 #include "luasrclib.h"
-#include "vgui/lischeme.h"
-#include "vgui/lvgui.h"
+#include "vgui/LIScheme.h"
+#include "vgui/LVGUI.h"
 #include "vgui_controls/lPanel_vgui_controls.h"
 #include "lColor.h"
 

@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2005, Valve Corporation, All rights reserved. ============//
+//========= Copyright Â© 1996-2005, Valve Corporation, All rights reserved. ============//
 //
 // Purpose: Basic header for using vgui
 //
@@ -11,6 +11,9 @@
 #ifdef _WIN32
 #pragma once
 #endif
+
+#include "lua.hpp"
+#include "IVGui.h"
 
 /* type for HScheme functions */
 typedef vgui::HScheme lua_HScheme;

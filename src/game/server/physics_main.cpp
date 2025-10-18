@@ -17,6 +17,7 @@
 #pragma warning(disable:4244)
 #elif POSIX
 #include <typeinfo>
+#endif
 
 #include "player.h"
 #include "ai_basenpc.h"

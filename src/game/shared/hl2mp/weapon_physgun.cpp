@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2005, Valve Corporation, All rights reserved. ============//
+//========= Copyright ï¿½ 1996-2005, Valve Corporation, All rights reserved. ============//
 //
 // Purpose: 
 //
@@ -12,7 +12,7 @@
 #endif
 #include "gamerules.h"
 #ifdef CLIENT_DLL
-#include "ClientEffectPrecacheSystem.h"
+#include "clienteffectprecachesystem.h"
 #endif
 #include "weapon_hl2mpbasehlmpcombatweapon.h"
 #ifndef CLIENT_DLL
@@ -31,7 +31,7 @@
 #ifndef CLIENT_DLL
 #include "player_pickup.h"
 #endif
-#include "soundemittersystem/isoundemittersystembase.h"
+#include "SoundEmitterSystem/isoundemittersystembase.h"
 #ifdef CLIENT_DLL
 #include "model_types.h"
 #include "view_shared.h"

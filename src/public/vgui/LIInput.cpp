@@ -8,7 +8,7 @@
 #define LIInput_cpp
 
 #include <cbase.h>
-#include "vgui/iinput.h"
+#include "vgui/IInput.h"
 #include "vgui_controls/Controls.h"
 #include <luamanager.h>
 #include "luasrclib.h"
@@ -56,11 +56,16 @@ static int input_GetCurrentIMEHandle (lua_State *L) {
 }
 
 static int input_GetCursorPos__USE_VCR_MODE (lua_State *L) {
+#if 0
   int x, y;
   input()->GetCursorPos__USE_VCR_MODE(x, y);
   lua_pushinteger(L, x);
   lua_pushinteger(L, y);
   return 2;
+#else
+  // @ThePixelMoon: doesn't exist in sdk2013 now!
+  return 0;
+#endif
 }
 
 static int input_GetCursorPosition (lua_State *L) {

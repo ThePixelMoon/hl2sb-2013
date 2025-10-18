@@ -4,7 +4,6 @@
 //
 //=============================================================================//
 
-#if !defined( HL2SB )
 #include "weapon_hl2mpbase.h"
 #include "weapon_hl2mpbasehlmpcombatweapon.h"
 
