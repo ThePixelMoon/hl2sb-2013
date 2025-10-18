@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2005, Valve Corporation, All rights reserved. ============//
+//========= Copyright ï¿½ 1996-2005, Valve Corporation, All rights reserved. ============//
 //
 // Purpose: 
 //
@@ -34,7 +34,7 @@ LUA_API lua_Color &lua_tocolor (lua_State *L, int idx) {
 */
 
 
-LUA_API void lua_pushcolor (lua_State *L, lua_Color &clr) {
+LUA_API void lua_pushcolor (lua_State *L, const lua_Color &clr) {
   lua_Color *pColor = (lua_Color *)lua_newuserdata(L, sizeof(lua_Color));
   *pColor = clr;
   luaL_getmetatable(L, "Color");
