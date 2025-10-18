@@ -43,41 +43,6 @@
 #endif
 
 #if defined( _WIN32 ) && !defined( _X360 )
-
-
-// Need to be able to define these if we link to a debug static lib!
-#undef _malloc_dbg
-#undef _calloc_dbg
-#undef _realloc_dbg
-#undef _expand_dbg
-#undef _free_dbg
-#undef _msize_dbg
-
-
-#if _MSC_VER >= 1930
-
-#if defined(DLLNAME)
-#define VPROGNAME V_STRINGIFY(DLLNAME)
-#elif defined(EXENAME)
-#define VPROGNAME V_STRINGIFY(EXENAME)
-#else
-#define VPROGNAME "noname"
-#endif
-
-static void* AllocUnattributed(size_t nSize)
-{
-	return g_pMemAlloc->Alloc(nSize, VPROGNAME, 0);
-}
-
-static void* ReallocUnattributed(void* pMem, size_t nSize)
-{
-	return g_pMemAlloc->Realloc(pMem, nSize, VPROGNAME, 0);
-}
-
-#undef VPROGNAME
-
-#else 
-
 const char *MakeModuleFileName()
 {
 	if ( g_pMemAlloc && g_pMemAlloc->IsDebugHeap() )
@@ -147,7 +112,6 @@ static void *ReallocUnattributed( void *pMem, size_t nSize )
 	else
 		return g_pMemAlloc->Realloc(pMem, nSize, pszOwner, 0);
 }
-#endif
 
 #else
 #define MakeModuleFileName() NULL
@@ -213,41 +177,6 @@ ALLOC_CALL void *calloc( size_t nCount, size_t nElementSize )
 //-----------------------------------------------------------------------------
 extern "C"
 {
-
-#if _MSC_VER >= 1930
-
-
-_CRTRESTRICT void* __cdecl _malloc_base(size_t nSize)
-{
-	return AllocUnattributed(nSize);
-}
-
-_CRTRESTRICT void* __cdecl _calloc_base(size_t nCount, size_t nSize)
-{
-	size_t nBytes = nCount * nSize;
-	void* pMem = AllocUnattributed(nBytes);
-	memset(pMem, 0, nBytes);
-	return pMem;
-}
-
-_CRTRESTRICT void* __cdecl _realloc_base( void *pMem, size_t nSize )
-{
-	return ReallocUnattributed( pMem, nSize );
-}
-
-_CRTRESTRICT void* __cdecl _recalloc_base( void *pMem, size_t nCount, size_t nSize)
-{
-	size_t nBytes = nCount * nSize;
-	size_t nBytesOld = _msize(pMem);
-
-	void *pMemOut = ReallocUnattributed( pMem, nBytes );
-	if(nBytes > nBytesOld)
-		memset(reinterpret_cast<char*>(pMemOut) + nBytesOld , 0, nBytes - nBytesOld);
-	
-	return pMemOut;
-}
-
-#else
 
 // 64-bit
 #ifdef _WIN64
@@ -585,6 +514,7 @@ private:
 
 extern "C"
 {
+	
 void *__cdecl _nh_malloc_dbg( size_t nSize, int nFlag, int nBlockUse,
 								const char *pFileName, int nLine )
 {
@@ -598,6 +528,14 @@ void *__cdecl _malloc_dbg( size_t nSize, int nBlockUse,
 	AttribIfCrt();
 	return g_pMemAlloc->Alloc(nSize, pFileName, nLine);
 }
+
+#if defined( _X360 )
+void *__cdecl _calloc_dbg_impl( size_t nNum, size_t nSize, int nBlockUse, 
+								const char * szFileName, int nLine, int * errno_tmp )
+{
+	return _calloc_dbg( nNum, nSize, nBlockUse, szFileName, nLine );
+}
+#endif
 
 void *__cdecl _calloc_dbg( size_t nNum, size_t nSize, int nBlockUse,
 							const char *pFileName, int nLine )
@@ -613,6 +551,7 @@ void *__cdecl _calloc_dbg_impl( size_t nNum, size_t nSize, int nBlockUse,
 {
 	return _calloc_dbg( nNum, nSize, nBlockUse, szFileName, nLine );
 }
+
 void *__cdecl _realloc_dbg( void *pMem, size_t nNewSize, int nBlockUse,
 							const char *pFileName, int nLine )
 {
@@ -626,6 +565,7 @@ void *__cdecl _expand_dbg( void *pMem, size_t nNewSize, int nBlockUse,
 	Assert( 0 );
 	return NULL;
 }
+
 void __cdecl _free_dbg( void *pMem, int nBlockUse )
 {
 	AttribIfCrt();
@@ -763,12 +703,11 @@ ALLOC_CALL void * __cdecl _aligned_offset_recalloc( void * memblock, size_t coun
 //-----------------------------------------------------------------------------
 // Override some the _CRT debugging allocation methods in MSVC
 //-----------------------------------------------------------------------------
-#if defined(_WIN32)
+#ifdef _WIN32
 
 extern "C"
 {
 	
-#if  _MSC_VER < 1930 || _DEBUG
 int _CrtDumpMemoryLeaks(void)
 {
 	return 0;
@@ -783,7 +722,6 @@ int _CrtSetDbgFlag( int nNewFlag )
 {
 	return g_pMemAlloc->CrtSetDbgFlag( nNewFlag );
 }
-#endif
 
 // 64-bit port.
 #define AFNAME(var) __p_##var
@@ -806,12 +744,12 @@ long* AFNAME(_crtBreakAlloc) (void)
 {
 	return AFRET(_crtBreakAlloc);
 }
+
 void __cdecl _CrtSetDbgBlockType( void *pMem, int nBlockUse )
 {
 	DebuggerBreak();
 }
 
-#if _MSC_VER < 1930 || _DEBUG
 _CRT_ALLOC_HOOK __cdecl _CrtSetAllocHook( _CRT_ALLOC_HOOK pfnNewHook )
 {
 	DebuggerBreak();
@@ -873,13 +811,12 @@ void __cdecl _CrtDoForAllClientObjects( void (*pfn)(void *, void *), void * pCon
 	DebuggerBreak();
 }
 
-#endif 
+
 //-----------------------------------------------------------------------------
 // Methods in dbgrpt.cpp 
 //-----------------------------------------------------------------------------
 long _crtAssertBusy = -1;
 
-#if _DEBUG
 int __cdecl _CrtSetReportMode( int nReportType, int nReportMode )
 {
 	return g_pMemAlloc->CrtSetReportMode( nReportType, nReportMode );
@@ -894,7 +831,6 @@ _CRT_REPORT_HOOK __cdecl _CrtSetReportHook( _CRT_REPORT_HOOK pfnNewHook )
 {
 	return (_CRT_REPORT_HOOK)g_pMemAlloc->CrtSetReportHook( pfnNewHook );
 }
-#endif
 
 int __cdecl _CrtDbgReport( int nRptType, const char * szFile,
         int nLine, const char * szModule, const char * szFormat, ... )
@@ -914,6 +850,7 @@ int __cdecl _CrtDbgReport( int nRptType, const char * szFile,
 
 	return g_pMemAlloc->CrtDbgReport( nRptType, szFile, nLine, szModule, output );
 }
+
 #if _MSC_VER >= 1400
 
 // Configure VS so that it will record crash dumps on pure-call violations
@@ -1026,7 +963,7 @@ ErrorHandlerRegistrar::ErrorHandlerRegistrar()
 	_set_invalid_parameter_handler( VInvalidParameterHandler );
 }
 
-#if defined( _DEBUG ) && _MSC_VER < 1930
+#if defined( _DEBUG )
  
 // wrapper which passes no debug info; not available in debug
 #ifndef	SUPPRESS_INVALID_PARAMETER_NO_INFO
@@ -1099,7 +1036,6 @@ extern "C" int __cdecl _CrtGetCheckCount( void )
     return __crtDebugCheckCount;
 }
 
-#if _DEBUG
 // aligned offset debug
 extern "C" void * __cdecl _aligned_offset_recalloc_dbg( void * memblock, size_t count, size_t size, size_t align, size_t offset, const char * f_name, int line_n )
 {
@@ -1114,30 +1050,11 @@ extern "C" void * __cdecl _aligned_offset_recalloc_dbg( void * memblock, size_t 
 
 extern "C" void * __cdecl _aligned_recalloc_dbg( void *memblock, size_t count, size_t size, size_t align, const char * f_name, int line_n )
 {
-	CMemAllocAttributeAlloction att(f_name, line_n);
-
-	size_t nBytes = count * size;
-	size_t nBytesOld = _msize(memblock);
-
-	void* pMem = MemAlloc_ReallocAligned(memblock, nBytes, align);
-
-	if (nBytes > nBytesOld)
-		memset(reinterpret_cast<char*>(pMem) + nBytesOld, 0, nBytes - nBytesOld);
-
-	return pMem;
+    return _aligned_offset_recalloc_dbg(memblock, count, size, align, 0, f_name, line_n);
 }
 
 extern "C" void * __cdecl _recalloc_dbg ( void * memblock, size_t count, size_t size, int nBlockUse, const char * szFileName, int nLine )
 {
-	size_t nBytes = count * size;
-	size_t nBytesOld = _msize(memblock);
-
-	void* pMem = g_pMemAlloc->Realloc(memblock, nBytes, szFileName, nLine);
-
-	if (nBytes > nBytesOld)
-		memset(reinterpret_cast<char*>(pMem) + nBytesOld, 0, nBytes - nBytesOld);
-
-	return pMem;
 	return _aligned_offset_recalloc_dbg(memblock, count, size, 0, 0, szFileName, nLine);
 }
 
@@ -1145,16 +1062,14 @@ _CRT_REPORT_HOOK __cdecl _CrtGetReportHook( void )
 {
 	return NULL;
 }
+
 #endif
-#endif
-#if _DEBUG
 int __cdecl _CrtReportBlockType(const void * pUserData)
 {
 	return 0;
 }
 
 
-#endif
 } // end extern "C"
 #endif // _WIN32
 
@@ -1215,13 +1130,24 @@ void __cdecl _free_dbg_nolock( void * pUserData, int nBlockUse)
         _free_dbg(pUserData, 0);
 }
 
-
-static int __cdecl CheckBytes(unsigned char* pb, unsigned char bCheck, size_t nSize)
+_CRT_ALLOC_HOOK __cdecl _CrtGetAllocHook ( void)
 {
-	int bOkay = TRUE;
-	return bOkay;
+		assert(0); 
+        return NULL;
 }
 
+static int __cdecl CheckBytes( unsigned char * pb, unsigned char bCheck, size_t nSize)
+{
+        int bOkay = TRUE;
+        return bOkay;
+}
+
+
+_CRT_DUMP_CLIENT __cdecl _CrtGetDumpClient ( void)
+{
+		assert(0); 
+        return NULL;
+}
 
 #if _MSC_VER >= 1400
 static void __cdecl _printMemBlockData( _locale_t plocinfo, _CrtMemBlockHeader * pHead)
@@ -1232,20 +1158,6 @@ static void __cdecl _CrtMemDumpAllObjectsSince_stat( const _CrtMemState * state,
 {
 }
 #endif
-
-#if _DEBUG || _MSC_VER < 1930
-_CRT_ALLOC_HOOK __cdecl _CrtGetAllocHook ( void)
-{
-		assert(0); 
-        return NULL;
-}
-
-_CRT_DUMP_CLIENT __cdecl _CrtGetDumpClient ( void)
-{
-		assert(0); 
-        return NULL;
-}
-
 void * __cdecl _aligned_malloc_dbg( size_t size, size_t align, const char * f_name, int line_n)
 {
     return _aligned_malloc(size, align);
@@ -1273,7 +1185,6 @@ void __cdecl _aligned_free_dbg( void * memblock)
 {
     _aligned_free(memblock);
 }
-#endif
 
 #if _MSC_VER < 1900
 size_t __cdecl _CrtSetDebugFillThreshold( size_t _NewDebugFillThreshold)
