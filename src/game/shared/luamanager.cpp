@@ -161,7 +161,7 @@ void luasrc_setmodulepaths(lua_State *L) {
     LUA_PATH_MODULES "/?.so",
 #endif
 	luaL_checkstring(L, -1) );
-  Q_strlower( lookupCPath );
+  //Q_strlower( lookupCPath );
   Q_FixSlashes( lookupCPath );
   lua_pop(L, 1);  /* pop result */
   lua_pushstring(L, lookupCPath);
@@ -172,7 +172,7 @@ void luasrc_setmodulepaths(lua_State *L) {
   //MAX_PATH + package.path:len();
   char lookupPath[MAX_PATH+197];
   Q_snprintf( lookupPath, sizeof( lookupPath ), "%s/%s;%s", gamePath, LUA_PATH_MODULES "/?.lua", luaL_checkstring(L, -1) );
-  Q_strlower( lookupPath );
+  //Q_strlower( lookupPath );
   Q_FixSlashes( lookupPath );
   lua_pop(L, 1);  /* pop result */
   lua_pushstring(L, lookupPath);
@@ -196,6 +196,7 @@ void luasrc_init_gameui (void) {
   luaopen_dbg(LGameUI);
   luaopen_engine(LGameUI);
   luaopen_enginevgui(LGameUI);
+  luaopen_Color(LGameUI); /* what genius forgot to add this */
   luaopen_FCVAR(LGameUI);
   luaopen_KeyValues(LGameUI);
   luaopen_Panel(LGameUI);
@@ -362,7 +363,7 @@ void luasrc_LoadEntities (const char *path)
 	while ( fn )
 	{
 		Q_strcpy( className, fn );
-		Q_strlower( className );
+		//Q_strlower( className );
 		if ( fn[0] != '.' )
 		{
 			if ( g_pFullFileSystem->FindIsDirectory( fh ) )
@@ -460,7 +461,7 @@ void luasrc_LoadWeapons (const char *path)
 	while ( fn )
 	{
 		Q_strcpy( className, fn );
-		Q_strlower( className );
+		//Q_strlower( className );
 		if ( fn[0] != '.' )
 		{
 			if ( g_pFullFileSystem->FindIsDirectory( fh ) )
@@ -715,7 +716,7 @@ static int DoFileCompletion( const char *partial, char commands[ COMMAND_COMPLET
 		char fullpath[ 512 ] = { 0 };
 		char filename[ 256 ] = { 0 };
 		Q_snprintf( filename, sizeof( filename ), LUA_ROOTPATH "/%s", args.ArgS() );
-		Q_strlower( filename );
+		//Q_strlower( filename );
 		Q_FixSlashes( filename );
 		if ( filesystem->FileExists( filename, "MOD" ) )
 		{
@@ -724,7 +725,7 @@ static int DoFileCompletion( const char *partial, char commands[ COMMAND_COMPLET
 		else
 		{
 			Q_snprintf( fullpath, sizeof( fullpath ), "%s/" LUA_ROOTPATH "/%s", engine->GetGameDirectory(), args.ArgS() );
-			Q_strlower( fullpath );
+			//Q_strlower( fullpath );
 			Q_FixSlashes( fullpath );
 		}
 
@@ -753,7 +754,7 @@ static int DoFileCompletion( const char *partial, char commands[ COMMAND_COMPLET
 		char fullpath[ 512 ] = { 0 };
 		char filename[ 256 ] = { 0 };
 		Q_snprintf( filename, sizeof( filename ), LUA_ROOTPATH "lua/%s", args.ArgS() );
-		Q_strlower( filename );
+		//Q_strlower( filename );
 		Q_FixSlashes( filename );
 		if ( filesystem->FileExists( filename, "MOD" ) )
 		{
@@ -766,7 +767,7 @@ static int DoFileCompletion( const char *partial, char commands[ COMMAND_COMPLET
 			engine->GetGameDir( gamePath, 256 );
 			Q_StripTrailingSlash( gamePath );
 			Q_snprintf( fullpath, sizeof( fullpath ), "%s/" LUA_ROOTPATH "/%s", gamePath, args.ArgS() );
-			Q_strlower( fullpath );
+			//Q_strlower( fullpath );
 			Q_FixSlashes( fullpath );
 		}
 
