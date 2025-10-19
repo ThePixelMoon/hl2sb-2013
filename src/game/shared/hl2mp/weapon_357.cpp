@@ -14,6 +14,9 @@
 	#include <prediction.h>
 #else
 	#include "hl2mp_player.h"
+#ifdef HL2SB
+	#include "te_effect_dispatch.h"
+#endif
 #endif
 
 #include "weapon_hl2mpbasehlmpcombatweapon.h"
