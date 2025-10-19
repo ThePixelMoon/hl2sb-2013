@@ -900,11 +900,11 @@ END_PREDICTION_DATA()
 LINK_ENTITY_TO_CLASS( weapon_physcannon, CWeaponPhysCannon );
 PRECACHE_WEAPON_REGISTER( weapon_physcannon );
 
-#if !defined( CLIENT_DLL ) || defined( VT_BASE )
+#if !defined( CLIENT_DLL ) || defined( HL2SB )
 
 acttable_t	CWeaponPhysCannon::m_acttable[] = 
 {
-#ifdef VT_BASE
+#ifdef HL2SB
 	{ ACT_MP_STAND_IDLE,				ACT_HL2MP_IDLE_PHYSGUN,					false },
 	{ ACT_MP_CROUCH_IDLE,				ACT_HL2MP_IDLE_CROUCH_PHYSGUN,			false },
 
@@ -926,7 +926,7 @@ acttable_t	CWeaponPhysCannon::m_acttable[] =
 	{ ACT_HL2MP_GESTURE_RANGE_ATTACK,	ACT_HL2MP_GESTURE_RANGE_ATTACK_PHYSGUN,	false },
 	{ ACT_HL2MP_GESTURE_RELOAD,			ACT_HL2MP_GESTURE_RELOAD_PHYSGUN,		false },
 	{ ACT_HL2MP_JUMP,					ACT_HL2MP_JUMP_PHYSGUN,					false },
-#endif // VT_BASE
+#endif // HL2SB
 };
 
 IMPLEMENT_ACTTABLE(CWeaponPhysCannon);
@@ -2251,7 +2251,7 @@ void CWeaponPhysCannon::DoEffectIdle( void )
 
 	StartEffects();
 
-#ifdef VT_BASE
+#ifdef HL2SB
 	// Turn on the glow sprites
 	for ( int i = PHYSCANNON_GLOW1; i < (PHYSCANNON_GLOW1+NUM_GLOW_SPRITES); i++ )
 	{
@@ -2324,7 +2324,7 @@ void CWeaponPhysCannon::DoEffectIdle( void )
 		}
 	}
 	*/
-#endif // VT_BASE
+#endif // HL2SB
 #endif
 }
 
@@ -2635,7 +2635,7 @@ void CWeaponPhysCannon::StopEffects( bool stopSound )
 	}
 }
 
-#ifdef VT_BASE
+#ifdef HL2SB
 #ifdef CLIENT_DLL
 void CWeaponPhysCannon::ThirdPersonSwitch( bool bThirdPerson )
 {
@@ -2645,7 +2645,7 @@ void CWeaponPhysCannon::ThirdPersonSwitch( bool bThirdPerson )
 	StartEffects();
 }
 #endif
-#endif // VT_BASE
+#endif // HL2SB
 
 //-----------------------------------------------------------------------------
 // Purpose: 
