@@ -1,4 +1,4 @@
---========== Copyleft © 2010, Team Sandbox, Some rights reserved. ===========--
+--========== Copyleft ï¿½ 2010, Team Sandbox, Some rights reserved. ===========--
 --
 -- Purpose:
 --
@@ -14,6 +14,8 @@ local tSpawnPointClassnames = {
   "info_player_counterterrorist",
   "info_player_axis",
   "info_player_allies",
+  "info_player_teamspawn",
+  "info_player_coop",
   "info_player_start"
 }
 

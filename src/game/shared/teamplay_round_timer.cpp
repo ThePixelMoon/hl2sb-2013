@@ -704,6 +704,7 @@ void CTeamRoundTimer::SendTimeWarning( int nWarning )
 		return;
 #endif
 
+#ifndef HL2SB
 	// don't play sounds if the level designer has turned them off or if it's during the WaitingForPlayers time
 	if ( !m_bTimerPaused && m_bAutoCountdown && !TeamplayRoundBasedRules()->IsInWaitingForPlayers() )
 	{
@@ -780,6 +781,7 @@ void CTeamRoundTimer::SendTimeWarning( int nWarning )
 			}
 		}
 	}
+#endif
 }
 
 #else
@@ -1140,6 +1142,7 @@ void CTeamRoundTimer::SetTimeRemaining( int iTimerSeconds )
 	// make sure we don't go over our max length
 	iTimerSeconds = m_nTimerMaxLength > 0 ? MIN( iTimerSeconds, m_nTimerMaxLength ) : iTimerSeconds;
 
+#ifndef HL2SB
 	float flTimerSeconds = (float)iTimerSeconds;
 	if ( TeamplayRoundBasedRules()->IsInTournamentMode() && TeamplayRoundBasedRules()->IsInStopWatch() && ObjectiveResource() && !IsStopWatchTimer() && !TeamplayRoundBasedRules()->InSetup() )
 	{
@@ -1155,6 +1158,7 @@ void CTeamRoundTimer::SetTimeRemaining( int iTimerSeconds )
 	}
 
 	m_flTimeRemaining = flTimerSeconds;
+#endif
 	m_flTimerEndTime = gpGlobals->curtime + m_flTimeRemaining;
 	m_nTimerLength = iTimerSeconds;
 	
@@ -1246,6 +1250,7 @@ void CTeamRoundTimer::AddTimerSeconds( int iSecondsToAdd, int iTeamResponsible /
 		}
 	}
 
+#ifndef HL2SB
 	float flSecondsToAdd = (float)iSecondsToAdd;
 	if ( TeamplayRoundBasedRules()->IsInTournamentMode() && TeamplayRoundBasedRules()->IsInStopWatch() && ObjectiveResource() && !IsStopWatchTimer() && !TeamplayRoundBasedRules()->InSetup() )
 	{
@@ -1273,10 +1278,12 @@ void CTeamRoundTimer::AddTimerSeconds( int iSecondsToAdd, int iTeamResponsible /
 	{
 		m_flTimerEndTime += flSecondsToAdd;
 	}
+#endif
 
 	m_nTimerLength += iSecondsToAdd;
 	CalculateOutputMessages();
 
+#ifndef HL2SB
 	if ( ( ObjectiveResource() && ObjectiveResource()->GetTimerToShowInHUD() == entindex() ) || ( TeamplayRoundBasedRules()->IsInKothMode() ) )
 	{
 		if ( !TeamplayRoundBasedRules()->InStalemate() && !TeamplayRoundBasedRules()->RoundHasBeenWon() && !TeamplayRoundBasedRules()->IsInKothMode() )
@@ -1317,6 +1324,7 @@ void CTeamRoundTimer::AddTimerSeconds( int iSecondsToAdd, int iTeamResponsible /
 			}
 		}
 	}
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -1537,7 +1545,9 @@ void CTeamRoundTimer::SetActiveTimer( CTeamRoundTimer *pNewlyActive )
 		}
 	}
 
+#ifndef HL2SB
 	ObjectiveResource()->SetTimerInHUD( pChosenTimer );
+#endif
 }
 
 #endif
