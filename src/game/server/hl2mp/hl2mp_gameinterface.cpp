@@ -19,7 +19,12 @@
 
 void CServerGameClients::GetPlayerLimits( int& minplayers, int& maxplayers, int &defaultMaxPlayers ) const
 {
+#ifdef HL2SB
+	// @ThePixelMoon: allow singleplayer
+	minplayers = 1;
+#else
 	minplayers = 2;
+#endif
 #ifdef PLATFORM_64BITS
 	maxplayers = MAX_PLAYERS;
 #else
