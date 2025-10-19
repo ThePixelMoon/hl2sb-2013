@@ -8,91 +8,14 @@
 #include "filesystem.h"
 #include "KeyValues.h"
 #include "mountsteamcontent.h"
-// Andrew; grab only what we need from Open Steamworks.
-// #include "SteamTypes.h"
-// #include "ISteam006.h"
+#include "steam/steam_api.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-bool Steam_MountSteamContent( int nExtraAppId )
-{
-#if 0
-	CreateInterfaceFn CreateInterface = Sys_GetFactory( "Steam.dll" );
-	if( !CreateInterface )
-		return false;
-
-	int nStatus = 0;
-
-	IAppSystem* pAppSystem = (IAppSystem *)CreateInterface( "SteamDLLAppsystem001", &nStatus );
-	if( !pAppSystem )
-		return false;
-
-	ISteam006* pSteam006 = (ISteam006 *)pAppSystem->QueryInterface( STEAM_INTERFACE_VERSION_006 );
-	if( !pSteam006 )
-		return false;
-
-	TSteamApp App;
-	App.szName = new char[ 255 ];
-	App.uMaxNameChars = 255;
-	App.szLatestVersionLabel = new char[ 255 ];
-	App.uMaxLatestVersionLabelChars = 255;
-	App.szCurrentVersionLabel = new char[ 255 ];
-	App.uMaxCurrentVersionLabelChars = 255;
-	App.szInstallDirName = new char[ 255 ];
-	App.uMaxInstallDirNameChars = 255;
-	App.szUnkString = new char[ 255 ];
-
-	TSteamError Error;
-
-	if( pSteam006->EnumerateApp( nExtraAppId, &App, &Error ) != 1 || Error.eSteamError != eSteamErrorNone )
-	{
-		delete[] App.szName;
-		delete[] App.szLatestVersionLabel;
-		delete[] App.szCurrentVersionLabel;
-		delete[] App.szInstallDirName;
-		delete[] App.szUnkString;
-
-		return false;
-	}
-
-	int bIsAppSubscribed = 0;
-	int Reserved = 0;
-	pSteam006->IsAppSubscribed( nExtraAppId, &bIsAppSubscribed, &Reserved, &Error );
-
-	if ( !bIsAppSubscribed )
-	{
-		return false;
-	}
-
-#ifdef GAME_DLL
-	Msg( "Mounting %s...\n", App.szName );
+#ifdef CLIENT_DLL
+#define UTIL_VarArgs VarArgs // Andrew; yep.
 #endif
-
-	for( unsigned int n = 0; n < App.uNumDependencies; n++ )
-	{
-		TSteamAppDependencyInfo Info;
-
-		if( pSteam006->EnumerateAppDependency( nExtraAppId, n, &Info, &Error ) != 1 || Error.eSteamError != eSteamErrorNone )
-			continue;
-
-		if( !pSteam006->MountFilesystem( Info.AppId, Info.szMountName, &Error ) || Error.eSteamError != eSteamErrorNone )
-		{
-#ifdef GAME_DLL
-			Warning( "%s\n", Error.szDesc );
-#endif
-		}
-	}
-
-	delete[] App.szName;
-	delete[] App.szLatestVersionLabel;
-	delete[] App.szCurrentVersionLabel;
-	delete[] App.szInstallDirName;
-	delete[] App.szUnkString;
-#endif
-
-	return true;
-}
 
 typedef struct
 {
@@ -112,24 +35,51 @@ gamePaths_t g_GamePaths[10] =
 	{ "ep2",		420 },
 	{ "tf",			440 }
 };
+const int g_GamePathsSize = sizeof(g_GamePaths) / sizeof(g_GamePaths[0]);
 
-void AddSearchPathByAppId( int nAppId )
+bool AddSearchPathByAppId(int nExtraAppId)
 {
-	for ( int i=0; i < ARRAYSIZE( g_GamePaths ); i++ )
-	{
-		int iVal = g_GamePaths[i].m_nAppId;
-		if ( iVal == 360 )
-		{
-			//Andrew; Half-Life Deathmatch: Source requires Half-Life: Source's path added!!
-			const char *pathName = g_GamePaths[2].m_pPathName;
-			filesystem->AddSearchPath( pathName, "GAME", PATH_ADD_TO_TAIL );
-		}
-		if ( iVal == nAppId )
-		{
-			const char *pathName = g_GamePaths[i].m_pPathName;
-			filesystem->AddSearchPath( pathName, "GAME", PATH_ADD_TO_TAIL );
-		}
-	}
+    if (!steamapicontext || !steamapicontext->SteamApps())
+        return false;
+
+    char szInstallDir[MAX_FILEPATH];
+    int len = steamapicontext->SteamApps()->GetAppInstallDir(nExtraAppId, szInstallDir, sizeof(szInstallDir));
+    if (len <= 0)
+        return false; // App not installed!!!
+
+    for (int i = 0; i < g_GamePathsSize; i++)
+    {
+        if (g_GamePaths[i].m_nAppId != nExtraAppId)
+            continue;
+
+        char fullPath[MAX_FILEPATH];
+        Q_snprintf(fullPath, sizeof(fullPath), "%s/%s", szInstallDir, g_GamePaths[i].m_pPathName);
+
+        Msg("Mounting path: %s\n", fullPath);
+        g_pFullFileSystem->AddSearchPath(fullPath, "GAME");
+
+        // The special case: HL1MP
+        if (nExtraAppId == 360)
+        {
+            char hl1Path[MAX_FILEPATH];
+            Q_snprintf(hl1Path, sizeof(hl1Path), "%s/hl1", szInstallDir);
+            g_pFullFileSystem->AddSearchPath(hl1Path, "GAME");
+        }
+
+        // The special case..again: HL2 Anniversary Update
+        if (nExtraAppId == 220)
+        {
+            const char* episodes[] = {"ep2", "episodic", "lostcoast"};
+            for (int j = 0; j < ARRAYSIZE(episodes); j++)
+            {
+                char epPath[MAX_FILEPATH];
+                Q_snprintf(epPath, sizeof(epPath), "%s/%s", szInstallDir, episodes[j]);
+                g_pFullFileSystem->AddSearchPath(epPath, "GAME");
+            }
+        }
+    }
+
+    return true;
 }
 
 //Andrew; this allows us to mount content the user wants on top of the existing
@@ -141,52 +91,26 @@ void MountUserContent()
 #ifdef CLIENT_DLL
 	const char *gamePath = engine->GetGameDirectory();
 #else
-	char gamePath[256];
-	engine->GetGameDir( gamePath, 256 );
+	char gamePath[MAX_PATH];
+	engine->GetGameDir( gamePath, MAX_PATH );
 	Q_StripTrailingSlash( gamePath );
 #endif
 
-	pMainFile = new KeyValues( "gamecontent.txt" );
-#ifdef CLIENT_DLL
-#define UTIL_VarArgs VarArgs //Andrew; yep.
-#endif
-//On linux because of case sensitiviy we need to check for both.
-#ifdef _LINUX
-	if ( pMainFile->LoadFromFile( filesystem, UTIL_VarArgs("%s/GameContent.txt", gamePath), "MOD" ) )
+	pMainFile = new KeyValues("gamecontent.txt");
+	if (pMainFile->LoadFromFile(filesystem, UTIL_VarArgs("%s/gamecontent.txt", gamePath), "MOD"))
 	{
-		pFileSystemInfo = pMainFile->FindKey( "FileSystem" );
+		pFileSystemInfo = pMainFile->FindKey("FileSystem");
 		if (pFileSystemInfo)
 		{
-			for ( KeyValues *pKey = pFileSystemInfo->GetFirstSubKey(); pKey; pKey = pKey->GetNextKey() )
+			for (KeyValues* pKey = pFileSystemInfo->GetFirstSubKey(); pKey; pKey = pKey->GetNextKey())
 			{
-				if ( strcmp( pKey->GetName(), "AppId" ) == 0 )
+				if (strcmp(pKey->GetName(), "appid") == 0)
 				{
 					int nExtraContentId = pKey->GetInt();
 					if (nExtraContentId)
 					{
-						AddSearchPathByAppId( nExtraContentId );
-						Steam_MountSteamContent( nExtraContentId );
-					}
-				}
-			}
-		}
-	}
-	else
-#endif
-	if ( pMainFile->LoadFromFile( filesystem, UTIL_VarArgs("%s/gamecontent.txt", gamePath), "MOD" ) )
-	{
-		pFileSystemInfo = pMainFile->FindKey( "FileSystem" );
-		if (pFileSystemInfo)
-		{
-			for ( KeyValues *pKey = pFileSystemInfo->GetFirstSubKey(); pKey; pKey = pKey->GetNextKey() )
-			{
-				if ( strcmp( pKey->GetName(), "AppId" ) == 0 )
-				{
-					int nExtraContentId = pKey->GetInt();
-					if (nExtraContentId)
-					{
-						AddSearchPathByAppId( nExtraContentId );
-						Steam_MountSteamContent( nExtraContentId );
+						DevMsg("Mounting AppID %i\n", nExtraContentId);
+						AddSearchPathByAppId(nExtraContentId);
 					}
 				}
 			}

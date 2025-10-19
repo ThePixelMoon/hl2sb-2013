@@ -1,4 +1,4 @@
-//========== Copyleft © 2011, Team Sandbox, Some rights reserved. ===========//
+//========== Copyleft ï¿½ 2011, Team Sandbox, Some rights reserved. ===========//
 //
 // Purpose: 
 //
@@ -10,11 +10,6 @@
 #ifdef _WIN32
 #pragma once
 #endif
-
-//-----------------------------------------------------------------------------
-// Mounts content directly through Steam instead of the engine filesystem
-//-----------------------------------------------------------------------------
-bool Steam_MountSteamContent( int nExtraAppId = -1 );
 
 void MountUserContent();
 
