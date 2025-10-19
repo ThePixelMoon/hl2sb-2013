@@ -35,4 +35,19 @@
 		"weapon"	"string" 	// weapon name killed used 
 		"weaponname"	"string" 	// weapon class name killed used 
 	}
+	
+	"teamplay_round_start"			// round restart
+	{
+		"full_reset"	"bool"		// is this a full reset of the map
+	}
+	
+	"spec_target_updated"
+	{
+	}
+	
+	"achievement_earned"
+	{
+		"player"	"byte"		// entindex of the player
+		"achievement"	"short"		// achievement ID
+	}
 }
