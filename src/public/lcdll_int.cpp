@@ -1,4 +1,4 @@
-//===== Copyright © 1996-2005, Valve Corporation, All rights reserved. ======//
+//===== Copyright ï¿½ 1996-2005, Valve Corporation, All rights reserved. ======//
 //
 // Purpose: Interfaces between the client.dll and engine
 //
@@ -14,7 +14,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-
+#ifdef CLIENT_DLL
 
 static int engine_ActivateOccluder (lua_State *L) {
   engine->ActivateOccluder(luaL_checkint(L, 1), luaL_checkboolean(L, 2));
@@ -239,15 +239,15 @@ static int engine_IsBoxInViewCluster (lua_State *L) {
   return 1;
 }
 
-//static int engine_IsBoxVisible (lua_State *L) {
-//  luaL_checkint(L, engine->IsBoxVisible(luaL_checkvector(L, 1), luaL_checkvector(L, 2)));
-//  return 1;
-//}
+static int engine_IsBoxVisible (lua_State *L) {
+  luaL_checkint(L, engine->IsBoxVisible(luaL_checkvector(L, 1), luaL_checkvector(L, 2)));
+  return 1;
+}
 
-//static int engine_IsConnected (lua_State *L) {
-//  lua_pushboolean(L, engine->IsConnected());
-//  return 1;
-//}
+static int engine_IsConnected (lua_State *L) {
+  lua_pushboolean(L, engine->IsConnected());
+  return 1;
+}
 
 static int engine_IsDrawingLoadingImage (lua_State *L) {
   lua_pushboolean(L, engine->IsDrawingLoadingImage());
@@ -449,7 +449,6 @@ static int engine_Time (lua_State *L) {
   return 1;
 }
 
-
 static const luaL_Reg enginelib[] = {
   {"ActivateOccluder",   engine_ActivateOccluder},
   {"ChangeTeam",  engine_ChangeTeam},
@@ -486,8 +485,8 @@ static const luaL_Reg enginelib[] = {
   {"GetUILanguage",     engine_GetUILanguage},
   {"GrabPreColorCorrectedFrame",     engine_GrabPreColorCorrectedFrame},
   {"IsBoxInViewCluster",     engine_IsBoxInViewCluster},
-  //{"IsBoxVisible",     engine_IsBoxVisible},
-  //{"IsConnected", engine_IsConnected},
+  {"IsBoxVisible",     engine_IsBoxVisible},
+  {"IsConnected", engine_IsConnected},
   {"IsDrawingLoadingImage",   engine_IsDrawingLoadingImage},
   {"IsHammerRunning",   engine_IsHammerRunning},
   {"IsHLTV",  engine_IsHLTV},
@@ -539,3 +538,4 @@ LUALIB_API int luaopen_engine (lua_State *L) {
   return 1;
 }
 
+#endif
