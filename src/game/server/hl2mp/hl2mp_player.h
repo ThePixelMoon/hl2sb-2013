@@ -56,6 +56,12 @@ public:
 	DECLARE_DATADESC();
 #ifndef HL2SB
 	DECLARE_ENT_SCRIPTDESC();
+#else
+	DECLARE_PREDICTABLE();
+
+	// This passes the event to the client's and server's CHL2MPPlayerAnimState.
+	void			DoAnimationEvent( PlayerAnimEvent_t event, int nData = 0 );
+	void			SetupBones( matrix3x4_t *pBoneToWorld, int boneMask );
 #endif
 
 	virtual void Precache( void );
@@ -63,7 +69,9 @@ public:
 	virtual void PostThink( void );
 	virtual void PreThink( void );
 	virtual void PlayerDeathThink( void );
-	virtual void SetAnimation( PLAYER_ANIM playerAnim );
+#ifndef HL2SB
+ 	virtual void SetAnimation( PLAYER_ANIM playerAnim );
+#endif // !HL2SB
 	virtual bool HandleCommand_JoinTeam( int team );
 	virtual bool ClientCommand( const CCommand &args );
 	virtual void CreateViewModel( int viewmodelindex = 0 );
@@ -93,9 +101,14 @@ public:
 #endif
 	bool	ValidatePlayerModel( const char *pModel );
 
-	QAngle GetAnimEyeAngles( void ) { return m_angEyeAngles.Get(); }
+#ifndef HL2SB
+ 	QAngle GetAnimEyeAngles( void ) { return m_angEyeAngles.Get(); }
+#endif // !HL2SB
 
 	Vector GetAttackSpread( CBaseCombatWeapon *pWeapon, CBaseEntity *pTarget = NULL );
+#ifdef HL2SB
+	virtual Vector GetAutoaimVector( float flDelta );
+#endif // HL2SB
 
 	void CheatImpulseCommands( int iImpulse );
 	void CreateRagdollEntity( void );
