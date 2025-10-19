@@ -14,6 +14,11 @@
 #include "iviewrender_beams.h"			// flashlight beam
 #include "r_efx.h"
 #include "dlight.h"
+#ifdef HL2SB
+#include "c_basetempentity.h"
+#include "prediction.h"
+#include "bone_setup.h"
+#endif // HL2SB
 
 #if defined( ARGG )
 #include "iclientmode.h"
