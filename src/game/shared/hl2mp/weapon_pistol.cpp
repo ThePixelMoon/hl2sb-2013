@@ -22,6 +22,10 @@
 #include "weapon_hl2mpbasehlmpcombatweapon.h"
 
 #ifdef HL2SB
+#include "weapon_hl2mpbase_machinegun.h"
+#endif // HL2SB
+
+#ifdef HL2SB
 #ifndef CLIENT_DLL
 #include "gamestats.h"
 #endif
@@ -212,6 +216,7 @@ acttable_t CWeaponPistol::m_acttable[] =
 #ifndef HL2SB
 	{ ACT_RANGE_ATTACK1,				ACT_RANGE_ATTACK_PISTOL,				false },
 #endif
+#endif // HL2SB
 
 #ifdef HL2SB
 	{ ACT_IDLE,						ACT_IDLE_PISTOL,				true },
