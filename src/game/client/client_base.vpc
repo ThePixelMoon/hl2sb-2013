@@ -1378,7 +1378,6 @@ $Project
 		$Lib		bitmap
 		$Lib		choreoobjects
 		$Lib		dmxloader
-		$Lib		lua51
 		$Lib		mathlib
 		$Lib		matsys_controls
 		$Lib		particles
@@ -1387,7 +1386,16 @@ $Project
 		$Lib		tier3
 		$Lib		vgui_controls
 		$Lib		vtf
-		$Lib		lua51
+		$Lib		lua51 [$LINUXALL]
+
+		$File "$SRCDIR\lib\x64\releasel\lua51.lib" [$WINDOWS]
+		{
+			$Configuration "Debug" 	{ $ExcludedFromBuild "Yes" }
+		}
+		$File "$SRCDIR\lib\x64\debugl\lua51.lib" [$WINDOWS]
+		{
+			$Configuration "Release" { $ExcludedFromBuild "Yes" }
+		}
 
 		$ImpLibexternal steam_api	[!$WIN64]
 		$ImpLibexternal steam_api64	[$WIN64]

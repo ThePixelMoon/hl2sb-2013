@@ -1139,7 +1139,16 @@ $Project
 		$Lib	particles
 		$Lib	tier2
 		$Lib	tier3
-		$Lib	lua51
+		$Lib	lua51 [$LINUXALL]
+
+		$File "$SRCDIR\lib\x64\releasel\lua51.lib" [$WINDOWS]
+		{
+			$Configuration "Debug" 	{ $ExcludedFromBuild "Yes" }
+		}
+		$File "$SRCDIR\lib\x64\debugl\lua51.lib" [$WINDOWS]
+		{
+			$Configuration "Release" { $ExcludedFromBuild "Yes" }
+		}
 
 		$ImpLibexternal steam_api	[!$WIN64]
 		$ImpLibexternal steam_api64	[$WIN64]
