@@ -391,8 +391,6 @@ $Project
 		$File	"matrixproxy.cpp"
 		$File	"menu.cpp"
 		$File	"message.cpp"
-		$File	"$SRCDIR\game\shared\mountaddons.cpp"
-		$File	"$SRCDIR\game\shared\mountaddons.h"
 		$File	"movehelper_client.cpp"
 		$File	"$SRCDIR\game\shared\movevars_shared.cpp"
 		$File	"$SRCDIR\game\shared\multiplay_gamerules.cpp"

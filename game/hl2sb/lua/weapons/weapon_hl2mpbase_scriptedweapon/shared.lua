@@ -1,4 +1,4 @@
---========== Copyleft © 2010, Team Sandbox, Some rights reserved. ===========--
+--========== Copyleft ï¿½ 2010, Team Sandbox, Some rights reserved. ===========--
 --
 -- Purpose: Initialize the base scripted weapon.
 --
@@ -36,23 +36,36 @@ SWEP.BuiltRightHanded		= 1
 SWEP.AllowFlipping			= 1
 SWEP.MeleeWeapon			= 0
 
--- TODO; implement Activity enum library!!
-SWEP.m_acttable				=
-{
-	{ 1048, 977, false },
-	{ 1049, 979, false },
+SWEP.m_acttable = {
+	{ ACT.MP_STAND_IDLE,				ACT.HL2MP_IDLE_PISTOL,					false },
+	{ ACT.MP_CROUCH_IDLE,				ACT.HL2MP_IDLE_CROUCH_PISTOL,			false },
 
-	{ 1058, 978, false },
-	{ 1061, 980, false },
+	{ ACT.MP_RUN,						ACT.HL2MP_RUN_PISTOL,					false },
+	{ ACT.MP_CROUCHWALK,				ACT.HL2MP_WALK_CROUCH_PISTOL,			false },
 
-	{ 1073, 981, false },
-	{ 1077, 981, false },
+	{ ACT.MP_ATTACK_STAND_PRIMARYFIRE,	ACT.HL2MP_GESTURE_RANGE_ATTACK_PISTOL,	false },
+	{ ACT.MP_ATTACK_CROUCH_PRIMARYFIRE,	ACT.HL2MP_GESTURE_RANGE_ATTACK_PISTOL,	false },
 
-	{ 1090, 982, false },
-	{ 1093, 982, false },
+	{ ACT.MP_RELOAD_STAND,				ACT.HL2MP_GESTURE_RELOAD_PISTOL,		false },
+	{ ACT.MP_RELOAD_CROUCH,				ACT.HL2MP_GESTURE_RELOAD_PISTOL,		false },
 
-	{ 1064, 983, false },
-};
+	{ ACT.MP_JUMP,						ACT.HL2MP_JUMP_PISTOL,					false },
+
+	{ ACT.IDLE,						ACT.IDLE_PISTOL,				true },
+	{ ACT.IDLE_ANGRY,				ACT.IDLE_ANGRY_PISTOL,			true },
+	{ ACT.RANGE_ATTACK1,			ACT.RANGE_ATTACK_PISTOL,		true },
+	{ ACT.RELOAD,					ACT.RELOAD_PISTOL,				true },
+	{ ACT.WALK_AIM,					ACT.WALK_AIM_PISTOL,			true },
+	{ ACT.RUN_AIM,					ACT.RUN_AIM_PISTOL,				true },
+	{ ACT.GESTURE_RANGE_ATTACK1,	ACT.GESTURE_RANGE_ATTACK_PISTOL,true },
+	{ ACT.RELOAD_LOW,				ACT.RELOAD_PISTOL_LOW,			false },
+	{ ACT.RANGE_ATTACK1_LOW,		ACT.RANGE_ATTACK_PISTOL_LOW,	false },
+	{ ACT.COVER_LOW,				ACT.COVER_PISTOL_LOW,			false },
+	{ ACT.RANGE_AIM_LOW,			ACT.RANGE_AIM_PISTOL_LOW,		false },
+	{ ACT.GESTURE_RELOAD,			ACT.GESTURE_RELOAD_PISTOL,		false },
+	{ ACT.WALK,						ACT.WALK_PISTOL,				false },
+	{ ACT.RUN,						ACT.RUN_PISTOL,					false },
+}
 
 function SWEP:Initialize()
 	self.m_bReloadsSingly	= false;

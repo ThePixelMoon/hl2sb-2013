@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2005, Valve Corporation, All rights reserved. ============//
+//========= Copyright ï¿½ 1996-2005, Valve Corporation, All rights reserved. ============//
 //
 // Purpose: 
 //
@@ -128,14 +128,14 @@ void ResetWeaponFactoryDatabase( void )
 
 // These functions serve as skeletons for the our weapons' actions to be
 // implemented in Lua.
-acttable_t *CHL2MPScriptedWeapon::ActivityList( void ) {
+acttable_t *CHL2MPScriptedWeapon::ActivityList( int &iActivityCount ) {
 #ifdef LUA_SDK
 	lua_getref( L, m_nTableReference );
 	lua_getfield( L, -1, "m_acttable" );
 	lua_remove( L, -2 );
 	if ( lua_istable( L, -1 ) )
 	{
-		for( int i = 0 ; i < LUA_MAX_WEAPON_ACTIVITIES ; i++ )
+		for( int i = 1 ; i < LUA_MAX_WEAPON_ACTIVITIES ; i++ )
 		{
 			lua_pushinteger( L, i );
 			lua_gettable( L, -2 );
@@ -166,6 +166,8 @@ acttable_t *CHL2MPScriptedWeapon::ActivityList( void ) {
 		}
 	}
 	lua_pop( L, 1 );
+
+	iActivityCount = ARRAYSIZE(m_acttable);
 #endif
 	return m_acttable;
 }

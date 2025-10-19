@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2005, Valve Corporation, All rights reserved. ============//
+//========= Copyright ï¿½ 1996-2005, Valve Corporation, All rights reserved. ============//
 //
 // Purpose: 
 //
@@ -36,7 +36,7 @@ public:
 	// DECLARE_ACTTABLE();
 
 	acttable_t m_acttable[LUA_MAX_WEAPON_ACTIVITIES];
-	acttable_t *ActivityList( void );
+	acttable_t *ActivityList( int &iActivityCount ) OVERRIDE;
 	int ActivityListCount( void );
 
 	void			Precache( void );
