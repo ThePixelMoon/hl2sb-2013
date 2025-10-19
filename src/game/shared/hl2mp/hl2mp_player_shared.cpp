@@ -39,6 +39,8 @@ const char *CHL2MP_Player::GetPlayerModelSoundPrefix( void )
 	return g_ppszPlayerSoundPrefixNames[m_iPlayerSoundType];
 }
 
+// @ThePixelMoon; https://developer.valvesoftware.com/wiki/Fixing_Per-Material_Footsteps_in_HL2MP
+#ifndef HL2SB
 void CHL2MP_Player::PrecacheFootStepSounds( void )
 {
 	int iFootstepSounds = ARRAYSIZE( g_ppszPlayerSoundPrefixNames );
@@ -55,6 +57,7 @@ void CHL2MP_Player::PrecacheFootStepSounds( void )
 		PrecacheScriptSound( szFootStepName );
 	}
 }
+#endif
 
 //-----------------------------------------------------------------------------
 // Consider the weapon's built-in accuracy, this character's proficiency with
@@ -69,6 +72,8 @@ Vector CHL2MP_Player::GetAttackSpread( CBaseCombatWeapon *pWeapon, CBaseEntity *
 	return VECTOR_CONE_15DEGREES;
 }
 
+// @ThePixelMoon; https://developer.valvesoftware.com/wiki/Fixing_Per-Material_Footsteps_in_HL2MP
+#ifndef HL2SB
 //-----------------------------------------------------------------------------
 // Purpose: 
 // Input  : step - 
@@ -139,6 +144,7 @@ void CHL2MP_Player::PlayStepSound( Vector &vecOrigin, surfacedata_t *psurface, f
 
 	EmitSound( filter, entindex(), ep );
 }
+#endif
 
 
 //==========================

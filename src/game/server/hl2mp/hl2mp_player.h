@@ -74,7 +74,9 @@ public:
 	virtual bool BumpWeapon( CBaseCombatWeapon *pWeapon );
 	virtual void ChangeTeam( int iTeam ) OVERRIDE;
 	virtual void PickupObject ( CBaseEntity *pObject, bool bLimitMassAndSize );
+#ifndef HL2SB
 	virtual void PlayStepSound( Vector &vecOrigin, surfacedata_t *psurface, float fvol, bool force );
+#endif
 	virtual void Weapon_Drop( CBaseCombatWeapon *pWeapon, const Vector *pvecTarget = NULL, const Vector *pVelocity = NULL );
 	virtual void UpdateOnRemove( void );
 	virtual void DeathSound( const CTakeDamageInfo &info );
@@ -83,7 +85,9 @@ public:
 	int FlashlightIsOn( void );
 	void FlashlightTurnOn( void );
 	void FlashlightTurnOff( void );
+#ifndef HL2SB
 	void	PrecacheFootStepSounds( void );
+#endif
 	bool	ValidatePlayerModel( const char *pModel );
 
 	QAngle GetAnimEyeAngles( void ) { return m_angEyeAngles.Get(); }
