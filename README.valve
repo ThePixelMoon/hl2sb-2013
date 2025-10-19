@@ -1,43 +1,71 @@
-               SOURCE 1 SDK LICENSE
+# Source SDK 2013
 
-Source SDK Copyright(c) Valve Corp.  
+Source code for Source SDK 2013.
 
-THIS DOCUMENT DESCRIBES A CONTRACT BETWEEN YOU AND VALVE 
-CORPORATION ("Valve").  PLEASE READ IT BEFORE DOWNLOADING OR USING 
-THE SOURCE ENGINE SDK ("SDK"). BY DOWNLOADING AND/OR USING THE 
-SOURCE ENGINE SDK YOU ACCEPT THIS LICENSE. IF YOU DO NOT AGREE TO 
-THE TERMS OF THIS LICENSE PLEASE DON’T DOWNLOAD OR USE THE SDK.  
+Contains the game code for Half-Life 2, HL2: DM and TF2.
 
-  You may, free of charge, download and use the SDK to develop a modified Valve game 
-running on the Source engine.  You may distribute your modified Valve game in source and 
-object code form, but only for free. Terms of use for Valve games are found in the Steam 
-Subscriber Agreement located here: http://store.steampowered.com/subscriber_agreement/ 
+**Now including Team Fortress 2! âœ¨**
 
-  You may copy, modify, and distribute the SDK and any modifications you make to the 
-SDK in source and object code form, but only for free.  Any distribution of this SDK must 
-include this LICENSE file and thirdpartylegalnotices.txt.  
- 
-  Any distribution of the SDK or a substantial portion of the SDK must include the above 
-copyright notice and the following: 
+## Build instructions
 
-    DISCLAIMER OF WARRANTIES.  THE SOURCE SDK AND ANY 
-    OTHER MATERIAL DOWNLOADED BY LICENSEE IS PROVIDED 
-    "AS IS".  VALVE AND ITS SUPPLIERS DISCLAIM ALL 
-    WARRANTIES WITH RESPECT TO THE SDK, EITHER EXPRESS 
-    OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, IMPLIED 
-    WARRANTIES OF MERCHANTABILITY, NON-INFRINGEMENT, 
-    TITLE AND FITNESS FOR A PARTICULAR PURPOSE.  
+Clone the repository using the following command:
 
-    LIMITATION OF LIABILITY.  IN NO EVENT SHALL VALVE OR 
-    ITS SUPPLIERS BE LIABLE FOR ANY SPECIAL, INCIDENTAL, 
-    INDIRECT, OR CONSEQUENTIAL DAMAGES WHATSOEVER 
-    (INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF 
-    BUSINESS PROFITS, BUSINESS INTERRUPTION, LOSS OF 
-    BUSINESS INFORMATION, OR ANY OTHER PECUNIARY LOSS) 
-    ARISING OUT OF THE USE OF OR INABILITY TO USE THE 
-    ENGINE AND/OR THE SDK, EVEN IF VALVE HAS BEEN 
-    ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.  
- 
-       
-If you would like to use the SDK for a commercial purpose, please contact Valve at 
-sourceengine@valvesoftware.com.
+`git clone https://github.com/ValveSoftware/source-sdk-2013`
+
+### Windows
+
+Requirements:
+ - Source SDK 2013 Multiplayer installed via Steam
+ - Visual Studio 2022 with the following workload and components:
+   - Desktop development with C++:
+     - MSVC v143 - VS 2022 C++ x64/x86 build tools (Latest)
+     - Windows 11 SDK (10.0.22621.0) or Windows 10 SDK (10.0.19041.1)
+ - Python 3.13 or later
+
+Inside the cloned directory, navigate to `src`, run:
+```bat
+createallprojects.bat
+```
+This will generate the Visual Studio project `everything.sln` which will be used to build your mod.
+
+Then, on the menu bar, go to `Build > Build Solution`, and wait for everything to build.
+
+You can then select the `Client (Mod Name)` project you wish to run, right click and select `Set as Startup Project` and hit the big green `> Local Windows Debugger` button on the tool bar in order to launch your mod.
+
+The default launch options should be already filled in for the `Release` configuration.
+
+### Linux
+
+Requirements:
+ - Source SDK 2013 Multiplayer installed via Steam
+ - podman
+
+Inside the cloned directory, navigate to `src`, run:
+```bash
+./buildallprojects
+```
+
+This will build all the projects related to the SDK and your mods automatically against the Steam Runtime.
+
+You can then, in the root of the cloned directory, you can navigate to `game` and run your mod by launching the build launcher for your mod project, eg:
+```bash
+./mod_tf
+```
+
+*Mods that are distributed on Steam MUST be built against the Steam Runtime, which the above steps will automatically do for you.*
+
+## Distributing your Mod
+
+There is guidance on distributing your mod both on and off Steam available at the following link:
+
+https://partner.steamgames.com/doc/sdk/uploading/distributing_source_engine
+
+## Additional Resources
+
+- [Valve Developer Wiki](https://developer.valvesoftware.com/wiki/Source_SDK_2013)
+
+## License
+
+The SDK is licensed to users on a non-commercial basis under the [SOURCE 1 SDK LICENSE](LICENSE), which is contained in the [LICENSE](LICENSE) file in the root of the repository.
+
+For more information, see [Distributing your Mod](#markdown-header-distributing-your-mod).
