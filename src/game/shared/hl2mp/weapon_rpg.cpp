@@ -1362,6 +1362,7 @@ acttable_t	CWeaponRPG::m_acttable[] =
 #ifndef HL2SB
 	{ ACT_RANGE_ATTACK1,				ACT_RANGE_ATTACK_RPG,				false },
 #endif
+#endif // HL2SB
 
 #ifdef HL2SB
 	{ ACT_RANGE_ATTACK1, ACT_RANGE_ATTACK_RPG, true },
