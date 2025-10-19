@@ -14,7 +14,7 @@ jobs:
         include:
           - os: windows-2025
             build_script: creategameprojects.bat
-            build_cmd: msbuild hl2sb.sln /p:Configuration=Release /p:Platform=win64 /m
+            build_cmd: msbuild games.sln /p:Configuration=Release /p:Platform=win64 /m
             artifact_name: hl2sb-windows
           - os: ubuntu-latest
             build_script: ./buildgameprojects
