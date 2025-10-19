@@ -113,7 +113,7 @@ public:
 #endif
 #endif
 
-#ifndef CLIENT_DLL
+#if !defined( CLIENT_DLL ) || defined( HL2SB )
 	DECLARE_ACTTABLE();
 #endif
 
@@ -188,6 +188,7 @@ acttable_t	CWeaponShotgun::m_acttable[] =
 #ifndef HL2SB
 	{ ACT_RANGE_ATTACK1,				ACT_RANGE_ATTACK_SHOTGUN,				false },
 #endif
+#endif // HL2SB
 
 #ifdef HL2SB
 	{ ACT_IDLE,						ACT_IDLE_SMG1,					true },	// FIXME: hook to shotgun unique
