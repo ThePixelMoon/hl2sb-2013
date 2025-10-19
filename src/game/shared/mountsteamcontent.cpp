@@ -37,49 +37,76 @@ gamePaths_t g_GamePaths[10] =
 };
 const int g_GamePathsSize = sizeof(g_GamePaths) / sizeof(g_GamePaths[0]);
 
-bool AddSearchPathByAppId(int nExtraAppId)
+static void MountVPKsInDir(const char *pDirPath)
 {
-    if (!steamapicontext || !steamapicontext->SteamApps())
-        return false;
+    FileFindHandle_t findHandle;
+    const char* pFileName = g_pFullFileSystem->FindFirstEx(UTIL_VarArgs("%s/*", pDirPath), "GAME", &findHandle);
 
-    char szInstallDir[MAX_FILEPATH];
-    int len = steamapicontext->SteamApps()->GetAppInstallDir(nExtraAppId, szInstallDir, sizeof(szInstallDir));
-    if (len <= 0)
-        return false; // App not installed!!!
-
-    for (int i = 0; i < g_GamePathsSize; i++)
+    while (pFileName)
     {
-        if (g_GamePaths[i].m_nAppId != nExtraAppId)
-            continue;
-
         char fullPath[MAX_FILEPATH];
-        Q_snprintf(fullPath, sizeof(fullPath), "%s/%s", szInstallDir, g_GamePaths[i].m_pPathName);
+        Q_snprintf(fullPath, sizeof(fullPath), "%s/%s", pDirPath, pFileName);
 
-        Msg("Mounting path: %s\n", fullPath);
-        g_pFullFileSystem->AddSearchPath(fullPath, "GAME");
-
-        // The special case: HL1MP
-        if (nExtraAppId == 360)
+        if (g_pFullFileSystem->FindIsDirectory(findHandle))
+            MountVPKsInDir(fullPath); // recursive into subfolders...
+        else
         {
-            char hl1Path[MAX_FILEPATH];
-            Q_snprintf(hl1Path, sizeof(hl1Path), "%s/hl1", szInstallDir);
-            g_pFullFileSystem->AddSearchPath(hl1Path, "GAME");
-        }
-
-        // The special case..again: HL2 Anniversary Update
-        if (nExtraAppId == 220)
-        {
-            const char* episodes[] = {"ep2", "episodic", "lostcoast"};
-            for (int j = 0; j < ARRAYSIZE(episodes); j++)
+            // mount any pak*.vpk
+            if (Q_stristr(pFileName, "_dir.vpk"))
             {
-                char epPath[MAX_FILEPATH];
-                Q_snprintf(epPath, sizeof(epPath), "%s/%s", szInstallDir, episodes[j]);
-                g_pFullFileSystem->AddSearchPath(epPath, "GAME");
+                Msg("Mounting VPK: %s\n", fullPath);
+                g_pFullFileSystem->AddSearchPath(fullPath, "GAME");
             }
         }
+        pFileName = g_pFullFileSystem->FindNext(findHandle);
     }
+    g_pFullFileSystem->FindClose(findHandle);
+}
 
-    return true;
+static bool AddSearchPathByAppId(int nExtraAppId)
+{
+	if (!steamapicontext || !steamapicontext->SteamApps())
+		return false;
+
+	char szInstallDir[MAX_FILEPATH];
+	int len = steamapicontext->SteamApps()->GetAppInstallDir(nExtraAppId, szInstallDir, sizeof(szInstallDir));
+	if (len <= 0)
+		return false; // App not installed!!!
+
+	for (int i = 0; i < g_GamePathsSize; i++)
+	{
+		if (g_GamePaths[i].m_nAppId != nExtraAppId)
+			continue;
+
+		char fullPath[MAX_FILEPATH];
+		Q_snprintf(fullPath, sizeof(fullPath), "%s/%s", szInstallDir, g_GamePaths[i].m_pPathName);
+		Msg("Mounting path: %s\n", fullPath);
+		g_pFullFileSystem->AddSearchPath(fullPath, "GAME");
+		MountVPKsInDir(fullPath);
+
+		// The special case: HL1MP
+		if (nExtraAppId == 360)
+		{
+			char hl1Path[MAX_FILEPATH];
+			Q_snprintf(hl1Path, sizeof(hl1Path), "%s/hl1", szInstallDir);
+			g_pFullFileSystem->AddSearchPath(hl1Path, "GAME");
+			MountVPKsInDir(hl1Path);
+		}
+
+		// The special case..again: HL2 Anniversary Update
+		if (nExtraAppId == 220)
+		{
+			const char* episodes[] = {"ep2", "episodic", "lostcoast"};
+			for (int j = 0; j < ARRAYSIZE(episodes); j++)
+			{
+				char epPath[MAX_FILEPATH];
+				Q_snprintf(epPath, sizeof(epPath), "%s/%s", szInstallDir, episodes[j]);
+				g_pFullFileSystem->AddSearchPath(epPath, "GAME");
+				MountVPKsInDir(epPath);
+			}
+		}
+	}
+	return true;
 }
 
 //Andrew; this allows us to mount content the user wants on top of the existing
