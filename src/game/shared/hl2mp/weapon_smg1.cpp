@@ -90,7 +90,7 @@ public:
 #endif
 #endif
 
-#ifndef CLIENT_DLL
+#if !defined( CLIENT_DLL ) || defined( HL2SB )
 	DECLARE_ACTTABLE();
 #endif
 
@@ -142,6 +142,7 @@ acttable_t	CWeaponSMG1::m_acttable[] =
 #ifndef HL2SB
 	{ ACT_RANGE_ATTACK1,				ACT_RANGE_ATTACK_SMG1,					false },
 #endif
+#endif // HL2SB
 
 #ifdef HL2SB
 	{ ACT_RANGE_ATTACK1,			ACT_RANGE_ATTACK_SMG1,			true },
@@ -467,7 +468,11 @@ void CWeaponSMG1::SecondaryAttack( void )
 #endif
 
 	// player "shoot" animation
-	pPlayer->SetAnimation( PLAYER_ATTACK1 );
+#ifdef HL2SB
+	pPlayer->DoAnimationEvent( PLAYERANIMEVENT_ATTACK_PRIMARY );
+#else
+ 	pPlayer->SetAnimation( PLAYER_ATTACK1 );
+#endif // HL2SB
 
 	// Decrease ammo
 	pPlayer->RemoveAmmo( 1, m_iSecondaryAmmoType );
