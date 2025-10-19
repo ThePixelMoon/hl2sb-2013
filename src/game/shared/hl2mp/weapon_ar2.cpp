@@ -95,6 +95,7 @@ acttable_t	CWeaponAR2::m_acttable[] =
 #ifndef HL2SB
 	{ ACT_RANGE_ATTACK1,				ACT_RANGE_ATTACK_AR2,				false },
 #endif
+#endif // HL2SB
 
 #ifdef HL2SB
 	{ ACT_RANGE_ATTACK1,			ACT_RANGE_ATTACK_AR2,			true },
