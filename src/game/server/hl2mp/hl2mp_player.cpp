@@ -46,6 +46,10 @@ ConVar hl2mp_spawn_frag_fallback_radius( "hl2mp_spawn_frag_fallback_radius", "48
 
 #define HL2MP_COMMAND_MAX_RATE 0.3
 
+#ifdef HL2SB
+#define CYCLELATCH_UPDATE_INTERVAL	0.2f
+#endif // HL2SB
+
 void DropPrimedFragGrenade( CHL2MP_Player *pPlayer, CBaseCombatWeapon *pGrenade );
 
 LINK_ENTITY_TO_CLASS( player, CHL2MP_Player );
@@ -53,6 +57,63 @@ LINK_ENTITY_TO_CLASS( player, CHL2MP_Player );
 LINK_ENTITY_TO_CLASS( info_player_combine, CPointEntity );
 LINK_ENTITY_TO_CLASS( info_player_rebel, CPointEntity );
 
+#ifdef HL2SB
+extern void SendProxy_Origin( const SendProp *pProp, const void *pStruct, const void *pData, DVariant *pOut, int iElement, int objectID );
+
+BEGIN_SEND_TABLE_NOBASE( CHL2MP_Player, DT_HL2MPLocalPlayerExclusive )
+	// send a hi-res origin to the local player for use in prediction
+	SendPropVector	(SENDINFO(m_vecOrigin), -1,  SPROP_NOSCALE|SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_Origin ),
+	SendPropFloat( SENDINFO_VECTORELEM(m_angEyeAngles, 0), 8, SPROP_CHANGES_OFTEN, -90.0f, 90.0f ),
+//	SendPropAngle( SENDINFO_VECTORELEM(m_angEyeAngles, 1), 10, SPROP_CHANGES_OFTEN ),
+END_SEND_TABLE()
+
+BEGIN_SEND_TABLE_NOBASE( CHL2MP_Player, DT_HL2MPNonLocalPlayerExclusive )
+	// send a lo-res origin to other players
+	SendPropVector	(SENDINFO(m_vecOrigin), -1,  SPROP_COORD_MP_LOWPRECISION|SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_Origin ),
+	SendPropFloat( SENDINFO_VECTORELEM(m_angEyeAngles, 0), 8, SPROP_CHANGES_OFTEN, -90.0f, 90.0f ),
+	SendPropAngle( SENDINFO_VECTORELEM(m_angEyeAngles, 1), 10, SPROP_CHANGES_OFTEN ),
+	// Only need to latch cycle for other players
+	// If you increase the number of bits networked, make sure to also modify the code below and in the client class.
+	SendPropInt( SENDINFO( m_cycleLatch ), 4, SPROP_UNSIGNED ),
+END_SEND_TABLE()
+
+IMPLEMENT_SERVERCLASS_ST(CHL2MP_Player, DT_HL2MP_Player)
+	SendPropExclude( "DT_BaseAnimating", "m_flPoseParameter" ),
+	SendPropExclude( "DT_BaseAnimating", "m_flPlaybackRate" ),	
+	SendPropExclude( "DT_BaseAnimating", "m_nSequence" ),
+	SendPropExclude( "DT_BaseEntity", "m_angRotation" ),
+	SendPropExclude( "DT_BaseAnimatingOverlay", "overlay_vars" ),
+
+	SendPropExclude( "DT_BaseEntity", "m_vecOrigin" ),
+
+	// misyl:
+	// m_flMaxspeed is fully predicted by the client and the client's
+	// maxspeed is sent in the user message.
+	// Other games like DOD, etc don't use this var at all and just fully
+	// predict in GameMovement, but the HL2 codebase doesn't do that and modifies this
+	// on the player.
+	// So, just never send it, and don't predict it on the client either.
+	SendPropExclude( "DT_BasePlayer", "m_flMaxspeed" ),
+
+	// playeranimstate and clientside animation takes care of these on the client
+	SendPropExclude( "DT_ServerAnimationData" , "m_flCycle" ),	
+	SendPropExclude( "DT_AnimTimeMustBeFirst" , "m_flAnimTime" ),
+
+	SendPropExclude( "DT_BaseFlex", "m_flexWeight" ),
+	SendPropExclude( "DT_BaseFlex", "m_blinktoggle" ),
+	SendPropExclude( "DT_BaseFlex", "m_viewtarget" ),
+
+	// Data that only gets sent to the local player.
+	SendPropDataTable( "hl2mplocaldata", 0, &REFERENCE_SEND_TABLE(DT_HL2MPLocalPlayerExclusive), SendProxy_SendLocalDataTable ),
+	// Data that gets sent to all other players
+	SendPropDataTable( "hl2mpnonlocaldata", 0, &REFERENCE_SEND_TABLE(DT_HL2MPNonLocalPlayerExclusive), SendProxy_SendNonLocalDataTable ),
+
+	SendPropEHandle( SENDINFO( m_hRagdoll ) ),
+	SendPropInt( SENDINFO( m_iSpawnInterpCounter), 4 ),
+	SendPropInt( SENDINFO( m_iPlayerSoundType), 3 ),
+
+END_SEND_TABLE()
+#else
 // specific to the local player
 BEGIN_SEND_TABLE_NOBASE( CHL2MP_Player, DT_HL2MPLocalPlayerExclusive )
 	// send a hi-res origin to the local player for use in prediction
@@ -104,6 +165,7 @@ IMPLEMENT_SERVERCLASS_ST(CHL2MP_Player, DT_HL2MP_Player)
 //	SendPropExclude( "DT_ServerAnimationData" , "m_flCycle" ),	
 //	SendPropExclude( "DT_AnimTimeMustBeFirst" , "m_flAnimTime" ),	
 END_SEND_TABLE()
+#endif
 
 BEGIN_DATADESC( CHL2MP_Player )
 END_DATADESC()
@@ -175,6 +237,38 @@ const char *g_ppszRandomCombineModels[] =
 
 #pragma warning( disable : 4355 )
 
+#ifdef HL2SB
+CHL2MP_Player::CHL2MP_Player()
+{
+	//Tony; create our player animation state.
+	m_PlayerAnimState = CreateHL2MPPlayerAnimState( this );
+	UseClientSideAnimation();
+
+	m_angEyeAngles.Init();
+
+	m_iLastWeaponFireUsercmd = 0;
+
+	m_flNextModelChangeTime = 0.0f;
+	m_flNextTeamChangeTime = 0.0f;
+
+	m_iSpawnInterpCounter = 0;
+
+    m_bEnterObserver = false;
+	m_bReady = false;
+
+	m_cycleLatch = 0;
+	m_cycleLatchTimer.Invalidate();
+
+	BaseClass::ChangeTeam( 0 );
+	
+//	UseClientSideAnimation();
+}
+
+CHL2MP_Player::~CHL2MP_Player( void )
+{
+	m_PlayerAnimState->Release();
+}
+#else
 CHL2MP_Player::CHL2MP_Player() : m_PlayerAnimState( this )
 {
 	m_angEyeAngles.Init();
@@ -198,6 +292,7 @@ CHL2MP_Player::~CHL2MP_Player( void )
 {
 
 }
+#endif // HL2SB
 
 void CHL2MP_Player::UpdateOnRemove( void )
 {
@@ -396,8 +491,10 @@ void CHL2MP_Player::Spawn(void)
 		GiveDefaultItems();
 	}
 
+#ifndef HL2SB
 	SetNumAnimOverlays( 3 );
 	ResetAnimation();
+#endif // !HL2SB
 
 	m_nRenderFX = kRenderNormal;
 
@@ -685,6 +782,7 @@ void CHL2MP_Player::SetupPlayerSoundsByModel( const char *pModelName )
 	}
 }
 
+#ifndef HL2SB
 void CHL2MP_Player::ResetAnimation( void )
 {
 	if ( IsAlive() )
@@ -704,22 +802,25 @@ void CHL2MP_Player::ResetAnimation( void )
 			SetAnimation( PLAYER_IDLE );
 	}
 }
-
+#endif // !HL2SB
 
 bool CHL2MP_Player::Weapon_Switch( CBaseCombatWeapon *pWeapon, int viewmodelindex )
 {
 	bool bRet = BaseClass::Weapon_Switch( pWeapon, viewmodelindex );
 
+#ifndef HL2SB
 	if ( bRet == true )
 	{
 		ResetAnimation();
 	}
+#endif // !HL2SB
 
 	return bRet;
 }
 
 void CHL2MP_Player::PreThink( void )
 {
+#ifndef HL2SB
 	QAngle vOldAngles = GetLocalAngles();
 	QAngle vTempAngles = GetLocalAngles();
 
@@ -731,14 +832,155 @@ void CHL2MP_Player::PreThink( void )
 	}
 
 	SetLocalAngles( vTempAngles );
+#endif // !HL2SB
 
 	BaseClass::PreThink();
 	State_PreThink();
 
 	//Reset bullet force accumulator, only lasts one frame
 	m_vecTotalBulletForce = vec3_origin;
+#ifndef HL2SB
 	SetLocalAngles( vOldAngles );
+#endif // !HL2SB
 }
+
+#ifdef HL2SB
+//-----------------------------------------------------------------------------
+// Purpose: multiplayer does not do autoaiming.
+//-----------------------------------------------------------------------------
+Vector CHL2MP_Player::GetAutoaimVector( float flScale )
+{
+	//No Autoaim
+	Vector	forward;
+	AngleVectors( EyeAngles() + m_Local.m_vecPunchAngle, &forward );
+	return	forward;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Do nothing multiplayer_animstate takes care of animation.
+// Input  : playerAnim - 
+//-----------------------------------------------------------------------------
+void CHL2MP_Player::SetAnimation( PLAYER_ANIM playerAnim )
+{
+	return;
+}
+
+// -------------------------------------------------------------------------------- //
+// Player animation event. Sent to the client when a player fires, jumps, reloads, etc..
+// -------------------------------------------------------------------------------- //
+class CTEPlayerAnimEvent : public CBaseTempEntity
+{
+public:
+	DECLARE_CLASS( CTEPlayerAnimEvent, CBaseTempEntity );
+	DECLARE_SERVERCLASS();
+
+	CTEPlayerAnimEvent( const char *name ) : CBaseTempEntity( name )
+	{
+	}
+
+	CNetworkHandle( CBasePlayer, m_hPlayer );
+	CNetworkVar( int, m_iEvent );
+	CNetworkVar( int, m_nData );
+};
+
+IMPLEMENT_SERVERCLASS_ST_NOBASE( CTEPlayerAnimEvent, DT_TEPlayerAnimEvent )
+	SendPropEHandle( SENDINFO( m_hPlayer ) ),
+	SendPropInt( SENDINFO( m_iEvent ), Q_log2( PLAYERANIMEVENT_COUNT ), SPROP_UNSIGNED ),
+	SendPropInt( SENDINFO( m_nData ), 32 )
+END_SEND_TABLE()
+
+static CTEPlayerAnimEvent g_TEPlayerAnimEvent( "PlayerAnimEvent" );
+
+void TE_PlayerAnimEvent( CBasePlayer *pPlayer, PlayerAnimEvent_t event, int nData )
+{
+	CPVSFilter filter( (const Vector&)pPlayer->EyePosition() );
+
+	//Tony; use prediction rules.
+	filter.UsePredictionRules();
+
+	g_TEPlayerAnimEvent.m_hPlayer = pPlayer;
+	g_TEPlayerAnimEvent.m_iEvent = event;
+	g_TEPlayerAnimEvent.m_nData = nData;
+	g_TEPlayerAnimEvent.Create( filter, 0 );
+}
+
+
+void CHL2MP_Player::DoAnimationEvent( PlayerAnimEvent_t event, int nData )
+{
+	m_PlayerAnimState->DoAnimationEvent( event, nData );
+	TE_PlayerAnimEvent( this, event, nData );	// Send to any clients who can see this guy.
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Override setup bones so that is uses the render angles from
+//			the HL2MP animation state to setup the hitboxes.
+//-----------------------------------------------------------------------------
+void CHL2MP_Player::SetupBones( matrix3x4_t *pBoneToWorld, int boneMask )
+{
+	VPROF_BUDGET( "CHL2MP_Player::SetupBones", VPROF_BUDGETGROUP_SERVER_ANIM );
+
+	// Get the studio header.
+	Assert( GetModelPtr() );
+	CStudioHdr *pStudioHdr = GetModelPtr( );
+	if ( !pStudioHdr )
+		return;
+
+	Vector pos[MAXSTUDIOBONES];
+	Quaternion q[MAXSTUDIOBONES];
+
+	// Adjust hit boxes based on IK driven offset.
+	Vector adjOrigin = GetAbsOrigin() + Vector( 0, 0, m_flEstIkOffset );
+
+	// FIXME: pass this into Studio_BuildMatrices to skip transforms
+	CBoneBitList boneComputed;
+	if ( m_pIk )
+	{
+		m_iIKCounter++;
+		m_pIk->Init( pStudioHdr, GetAbsAngles(), adjOrigin, gpGlobals->curtime, m_iIKCounter, boneMask );
+		GetSkeleton( pStudioHdr, pos, q, boneMask );
+
+		m_pIk->UpdateTargets( pos, q, pBoneToWorld, boneComputed );
+		CalculateIKLocks( gpGlobals->curtime );
+		m_pIk->SolveDependencies( pos, q, pBoneToWorld, boneComputed );
+	}
+	else
+	{
+		GetSkeleton( pStudioHdr, pos, q, boneMask );
+	}
+
+	CBaseAnimating *pParent = dynamic_cast< CBaseAnimating* >( GetMoveParent() );
+	if ( pParent )
+	{
+		// We're doing bone merging, so do special stuff here.
+		CBoneCache *pParentCache = pParent->GetBoneCache();
+		if ( pParentCache )
+		{
+			BuildMatricesWithBoneMerge( 
+				pStudioHdr, 
+				m_PlayerAnimState->GetRenderAngles(),
+				adjOrigin, 
+				pos, 
+				q, 
+				pBoneToWorld, 
+				pParent, 
+				pParentCache );
+
+			return;
+		}
+	}
+
+	Studio_BuildMatrices( 
+		pStudioHdr, 
+		m_PlayerAnimState->GetRenderAngles(),
+		adjOrigin, 
+		pos, 
+		q, 
+		-1,
+		GetModelScale(), // Scaling
+		pBoneToWorld,
+		boneMask );
+}
+#endif // HL2SB
 
 void CHL2MP_Player::PostThink( void )
 {
@@ -749,14 +991,29 @@ void CHL2MP_Player::PostThink( void )
 		SetCollisionBounds( VEC_CROUCH_TRACE_MIN, VEC_CROUCH_TRACE_MAX );
 	}
 
+#ifndef HL2SB
 	m_PlayerAnimState.Update();
 
 	// Store the eye angles pitch so the client can compute its animation state correctly.
 	m_angEyeAngles = EyeAngles();
+#endif // !HL2SB
 
 	QAngle angles = GetLocalAngles();
 	angles[PITCH] = 0;
 	SetLocalAngles( angles );
+
+#ifdef HL2SB
+	// Store the eye angles pitch so the client can compute its animation state correctly.
+	m_angEyeAngles = EyeAngles();
+	m_PlayerAnimState->Update( m_angEyeAngles[YAW], m_angEyeAngles[PITCH] );
+
+	if ( IsAlive() && m_cycleLatchTimer.IsElapsed() )
+	{
+		m_cycleLatchTimer.Start( CYCLELATCH_UPDATE_INTERVAL );
+		// Compress the cycle into 4 bits. Can represent 0.0625 in steps which is enough.
+		m_cycleLatch.GetForModify() = 16 * GetCycle();
+	}
+#endif // HL2SB
 }
 
 void CHL2MP_Player::PlayerDeathThink()
@@ -871,6 +1128,7 @@ Activity CHL2MP_Player::TranslateTeamActivity( Activity ActToTranslate )
 
 extern ConVar hl2_normspeed;
 
+#ifndef HL2SB
 // Set the activity based on an event or current state
 void CHL2MP_Player::SetAnimation( PLAYER_ANIM playerAnim )
 {
@@ -1036,7 +1294,7 @@ void CHL2MP_Player::SetAnimation( PLAYER_ANIM playerAnim )
 	ResetSequence( animDesired );
 	SetCycle( 0 );
 }
-
+#endif // !HL2SB
 
 extern int	gEvilImpulse101;
 //-----------------------------------------------------------------------------
@@ -1447,7 +1705,9 @@ void CHL2MP_Player::Event_Killed( const CTakeDamageInfo &info )
 	CTakeDamageInfo subinfo = info;
 	subinfo.SetDamageForce( m_vecTotalBulletForce );
 
+#ifndef HL2SB
 	SetNumAnimOverlays( 0 );
+#endif // !HL2SB
 
 	// Note: since we're dead, it won't draw us on the client, but we don't set EF_NODRAW
 	// because we still want to transmit to the clients in our PVS.

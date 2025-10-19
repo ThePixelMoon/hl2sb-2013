@@ -90,7 +90,7 @@ protected:
 	CNetworkVar( bool,		m_bShotDelayed );
 	int						m_nVentPose;
 	
-#ifndef CLIENT_DLL
+#if !defined( CLIENT_DLL ) || defined( HL2SB )
 	DECLARE_ACTTABLE();
 #endif
 };

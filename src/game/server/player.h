@@ -568,6 +568,9 @@ public:
 	virtual void			PickupObject( CBaseEntity *pObject, bool bLimitMassAndSize = true ) {}
 	virtual void			ForceDropOfCarriedPhysObjects( CBaseEntity *pOnlyIfHoldindThis = NULL ) {}
 	virtual float			GetHeldObjectMass( IPhysicsObject *pHeldObject );
+#ifdef HL2SB
+	virtual CBaseEntity		*GetHeldObject( void );
+#endif // HL2SB
 
 	void					CheckSuitUpdate();
 	void					SetSuitUpdate(const char *name, int fgroup, int iNoRepeat);

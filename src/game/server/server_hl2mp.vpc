@@ -14,7 +14,7 @@ $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\game\shared\hl2,$SRCDIR\game\shared\episodic,.\hl2,.\episodic,.\hl2mp,$SRCDIR\game\shared\hl2mp,$SRCDIR\thirdparty\luajit\src"
+		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\game\shared\hl2,$SRCDIR\game\shared\episodic,.\hl2,.\episodic,.\hl2mp,$SRCDIR\game\shared\hl2mp,$SRCDIR\thirdparty\luajit\src,$SRCDIR\game\shared\Multiplayer"
 		$PreprocessorDefinitions		"$BASE;HL2MP;HL2_DLL;HL2_EPISODIC;ARGG;LUA_SDK;HL2SB;NEXT_BOT"
 	}
 }
@@ -374,6 +374,10 @@ $Project "Server (HL2MP)"
 
 		$Folder "HL2SB"
 		{
+			$File	"$SRCDIR\game\shared\hl2mp\hl2mp_playeranimstate.h"
+			$File	"$SRCDIR\game\shared\hl2mp\hl2mp_playeranimstate.cpp"
+			$File	"$SRCDIR\game\shared\Multiplayer\multiplayer_animstate.h"
+			$File	"$SRCDIR\game\shared\Multiplayer\multiplayer_animstate.cpp"
 			$File	"$SRCDIR\game\shared\mountsteamcontent.cpp"
 			$File	"$SRCDIR\game\shared\mountsteamcontent.h"
 			$File	"$SRCDIR\game\shared\hl2mp\weapon_physgun.cpp"

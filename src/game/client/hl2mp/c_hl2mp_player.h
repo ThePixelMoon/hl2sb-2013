@@ -9,7 +9,11 @@
 #define HL2MP_PLAYER_H
 #pragma once
 
+#ifdef HL2SB
+#include "hl2mp_playeranimstate.h"
+#else
 class C_HL2MP_Player;
+#endif // HL2SB
 #include "c_basehlplayer.h"
 #include "hl2mp_player_shared.h"
 #include "beamdraw.h"
@@ -60,7 +64,9 @@ public:
 	virtual int DrawModel( int flags );
 	virtual void AddEntity( void );
 
+#ifndef HL2SB
 	QAngle GetAnimEyeAngles( void ) { return m_angEyeAngles; }
+#endif // !HL2SB
 	Vector GetAttackSpread( CBaseCombatWeapon *pWeapon, CBaseEntity *pTarget = NULL );
 
 
@@ -122,13 +128,28 @@ public:
 	void StopWalking( void );
 	bool IsWalking( void ) { return m_fIsWalking; }
 
+#ifdef HL2SB
+	virtual void					UpdateClientSideAnimation();
+	void DoAnimationEvent( PlayerAnimEvent_t event, int nData = 0 );
+	virtual void CalculateIKLocks( float currentTime );
+
+	static void RecvProxy_CycleLatch( const CRecvProxyData *pData, void *pStruct, void *pOut );
+
+	virtual float GetServerIntendedCycle() { return m_flServerCycle; }
+	virtual void SetServerIntendedCycle( float cycle ) { m_flServerCycle = cycle; }
+#else
 	virtual void PostThink( void );
+#endif // HL2SB
 
 private:
 	
 	C_HL2MP_Player( const C_HL2MP_Player & );
 
+#ifdef HL2SB
+	CHL2MPPlayerAnimState *m_PlayerAnimState;
+#else
 	CPlayerAnimState m_PlayerAnimState;
+#endif // HL2SB
 
 	QAngle	m_angEyeAngles;
 
@@ -165,6 +186,10 @@ private:
 	CNetworkVar( HL2MPPlayerState, m_iPlayerState );	
 
 	bool m_fIsWalking = false;
+#ifdef HL2SB
+	int m_cycleLatch; // The animation cycle goes out of sync very easily. Mostly from the player entering/exiting PVS. Server will frequently update us with a new one.
+	float m_flServerCycle;
+#endif // HL2SB
 };
 
 inline C_HL2MP_Player *ToHL2MPPlayer( CBaseEntity *pEntity )

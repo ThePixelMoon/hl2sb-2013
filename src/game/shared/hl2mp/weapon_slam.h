@@ -79,8 +79,10 @@ public:
 
 	CWeapon_SLAM();
 
-#ifndef CLIENT_DLL
+#if !defined( CLIENT_DLL ) || defined( HL2SB )
 	DECLARE_ACTTABLE();
+#endif
+#ifndef CLIENT_DLL
 	DECLARE_DATADESC();
 #endif
 

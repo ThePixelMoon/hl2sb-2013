@@ -535,6 +535,11 @@ public:
 	bool					WantsToOverrideViewmodelAttachments( void ) { return false; }
 #endif
 
+#ifdef HL2SB
+	//Tony; notifications of any third person switches.
+	virtual void			ThirdPersonSwitch( bool bThirdPerson ) {};
+#endif // HL2SB
+
 #endif // End client-only methods
 
 	virtual bool			CanLower( void ) { return false; }

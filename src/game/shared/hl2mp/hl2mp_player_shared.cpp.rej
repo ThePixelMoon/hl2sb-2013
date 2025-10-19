@@ -1,0 +1,22 @@
+diff a/src/game/shared/hl2mp/hl2mp_player_shared.cpp b/src/game/shared/hl2mp/hl2mp_player_shared.cpp	(rejected hunks)
+@@ -18,6 +18,11 @@
+ #include "engine/IEngineSound.h"
+ #include "SoundEmitterSystem/isoundemittersystembase.h"
+ 
++#ifdef HL2SB
++// memdbgon must be the last include file in a .cpp file!!!
++#include "tier0/memdbgon.h"
++#endif // HL2SB
++
+ extern ConVar sv_footsteps;
+ 
+ const char *g_ppszPlayerSoundPrefixNames[PLAYER_SOUNDS_MAX] =
+@@ -121,7 +126,7 @@ void CHL2MP_Player::PlayStepSound( Vector &vecOrigin, surfacedata_t *psurface, f
+ 	EmitSound( filter, entindex(), ep );
+ }
+ 
+-
++#ifndef HL2SB
+ //==========================
+ // ANIMATION CODE
+ //==========================

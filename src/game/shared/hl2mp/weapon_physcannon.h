@@ -421,6 +421,10 @@ protected:
 
 	void			NotifyShouldTransmit( ShouldTransmitState_t state );
 
+#ifdef HL2SB
+	virtual void ThirdPersonSwitch( bool bThirdPerson );
+#endif // HL2SB
+
 #endif	// CLIENT_DLL
 
 	int		m_nChangeState;				// For delayed state change of elements
@@ -446,7 +450,7 @@ protected:
 private:
 	CWeaponPhysCannon( const CWeaponPhysCannon & );
 
-#ifndef CLIENT_DLL
+#if !defined( CLIENT_DLL ) || defined( HL2SB )
 	DECLARE_ACTTABLE();
 #endif
 };

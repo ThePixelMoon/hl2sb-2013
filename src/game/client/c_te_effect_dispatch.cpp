@@ -184,6 +184,13 @@ void DispatchEffect( const char *pName, const CEffectData &data, C_RecipientFilt
 	te->DispatchEffect( filter, 0.0, data.m_vOrigin, pName, data );
 }
 
+#ifdef HL2SB
+void DispatchEffect( const char *pName, const CEffectData &data, IRecipientFilter &filter )
+{
+	te->DispatchEffect( filter, 0.0, data.m_vOrigin, pName, data );
+}
+#endif // HL2SB
+
 //-----------------------------------------------------------------------------
 // Playback
 //-----------------------------------------------------------------------------

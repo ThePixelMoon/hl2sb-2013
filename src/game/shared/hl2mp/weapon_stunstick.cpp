@@ -63,7 +63,7 @@ public:
 	DECLARE_NETWORKCLASS(); 
 	DECLARE_PREDICTABLE();
 
-#ifndef CLIENT_DLL
+#if !defined( CLIENT_DLL ) || defined( HL2SB )
 	DECLARE_ACTTABLE();
 #endif
 
@@ -73,7 +73,9 @@ public:
 	virtual void			OnDataChanged( DataUpdateType_t updateType );
 	virtual RenderGroup_t	GetRenderGroup( void );
 	virtual void			ViewModelDrawn( C_BaseViewModel *pBaseViewModel );
-	
+#ifdef HL2SB
+	virtual bool			IsTransparent( void );
+#endif // HL2SB
 #endif
 
 	virtual void Precache();
@@ -130,6 +132,11 @@ private:
 
 	float	m_flFadeTime;
 
+#ifdef HL2SB
+	//Tony; third person check thing, this has to be done for the local player if third person switches, so we can re-calc attachment points.
+	virtual void			ThirdPersonSwitch( bool bThirdPerson );
+#endif // HL2SB
+
 #endif
 
 	CNetworkVar( bool, m_bActive );
@@ -156,10 +163,25 @@ LINK_ENTITY_TO_CLASS( weapon_stunstick, CWeaponStunStick );
 PRECACHE_WEAPON_REGISTER( weapon_stunstick );
 
 
-#ifndef CLIENT_DLL
+#if !defined( CLIENT_DLL ) || defined( HL2SB )
 
 acttable_t	CWeaponStunStick::m_acttable[] = 
 {
+#ifdef HL2SB
+	{ ACT_MP_STAND_IDLE,				ACT_HL2MP_IDLE_MELEE,					false },
+	{ ACT_MP_CROUCH_IDLE,				ACT_HL2MP_IDLE_CROUCH_MELEE,			false },
+
+	{ ACT_MP_RUN,						ACT_HL2MP_RUN_MELEE,					false },
+	{ ACT_MP_CROUCHWALK,				ACT_HL2MP_WALK_CROUCH_MELEE,			false },
+
+	{ ACT_MP_ATTACK_STAND_PRIMARYFIRE,	ACT_HL2MP_GESTURE_RANGE_ATTACK_MELEE,	false },
+	{ ACT_MP_ATTACK_CROUCH_PRIMARYFIRE,	ACT_HL2MP_GESTURE_RANGE_ATTACK_MELEE,	false },
+
+	{ ACT_MP_RELOAD_STAND,				ACT_HL2MP_GESTURE_RELOAD_MELEE,			false },
+	{ ACT_MP_RELOAD_CROUCH,				ACT_HL2MP_GESTURE_RELOAD_MELEE,			false },
+
+	{ ACT_MP_JUMP,						ACT_HL2MP_JUMP_MELEE,					false },
+#else
 	{ ACT_RANGE_ATTACK1,				ACT_RANGE_ATTACK_SLAM, true },
 	{ ACT_HL2MP_IDLE,					ACT_HL2MP_IDLE_MELEE,					false },
 	{ ACT_HL2MP_RUN,					ACT_HL2MP_RUN_MELEE,					false },
@@ -498,6 +520,12 @@ void CWeaponStunStick::SetStunState( bool state )
 bool CWeaponStunStick::Deploy( void )
 {
 	SetStunState( true );
+#ifdef HL2SB
+#ifdef CLIENT_DLL
+	//Tony; we need to just do this
+	SetupAttachmentPoints();
+#endif
+#endif // HL2SB
 
 	return BaseClass::Deploy();
 }
@@ -834,6 +862,13 @@ void C_WeaponStunStick::DrawThirdPersonEffects( void )
 	}
 }
 
+#ifdef HL2SB
+void C_WeaponStunStick::ThirdPersonSwitch( bool bThirdPerson )
+{
+	SetupAttachmentPoints();
+}
+#endif // HL2SB
+
 //-----------------------------------------------------------------------------
 // Purpose: Draw our special effects
 //-----------------------------------------------------------------------------
@@ -922,6 +957,16 @@ void C_WeaponStunStick::ViewModelDrawn( C_BaseViewModel *pBaseViewModel )
 
 	BaseClass::ViewModelDrawn( pBaseViewModel );
 }
+
+#ifdef HL2SB
+//-----------------------------------------------------------------------------
+// Purpose: We are always considered transparent
+//-----------------------------------------------------------------------------
+bool C_WeaponStunStick::IsTransparent( void )
+{
+	return true;
+}
+#endif // HL2SB
 
 //-----------------------------------------------------------------------------
 // Purpose: Draw a cheap glow quad at our impact point (with sparks)

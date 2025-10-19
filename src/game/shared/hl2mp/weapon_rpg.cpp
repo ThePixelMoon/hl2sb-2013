@@ -1334,9 +1334,24 @@ END_PREDICTION_DATA()
 
 #endif
 
-#ifndef CLIENT_DLL
+#if !defined( CLIENT_DLL ) || defined( HL2SB )
 acttable_t	CWeaponRPG::m_acttable[] = 
 {
+#ifdef HL2SB
+	{ ACT_MP_STAND_IDLE,				ACT_HL2MP_IDLE_RPG,					false },
+	{ ACT_MP_CROUCH_IDLE,				ACT_HL2MP_IDLE_CROUCH_RPG,			false },
+
+	{ ACT_MP_RUN,						ACT_HL2MP_RUN_RPG,					false },
+	{ ACT_MP_CROUCHWALK,				ACT_HL2MP_WALK_CROUCH_RPG,			false },
+
+	{ ACT_MP_ATTACK_STAND_PRIMARYFIRE,	ACT_HL2MP_GESTURE_RANGE_ATTACK_RPG,	false },
+	{ ACT_MP_ATTACK_CROUCH_PRIMARYFIRE,	ACT_HL2MP_GESTURE_RANGE_ATTACK_RPG,	false },
+
+	{ ACT_MP_RELOAD_STAND,				ACT_HL2MP_GESTURE_RELOAD_RPG,		false },
+	{ ACT_MP_RELOAD_CROUCH,				ACT_HL2MP_GESTURE_RELOAD_RPG,		false },
+
+	{ ACT_MP_JUMP,						ACT_HL2MP_JUMP_RPG,					false },
+#else
 	{ ACT_HL2MP_IDLE,					ACT_HL2MP_IDLE_RPG,					false },
 	{ ACT_HL2MP_RUN,					ACT_HL2MP_RUN_RPG,					false },
 	{ ACT_HL2MP_IDLE_CROUCH,			ACT_HL2MP_IDLE_CROUCH_RPG,			false },
@@ -1543,7 +1558,11 @@ bool CWeaponRPG::WeaponShouldBeLowered( void )
 void CWeaponRPG::PrimaryAttack( void )
 {
 	// Only the player fires this way so we can cast
+#ifdef HL2SB
+	CHL2MP_Player *pPlayer = ToHL2MPPlayer( GetOwner() );
+#else
 	CBasePlayer *pPlayer = ToBasePlayer( GetOwner() );
+#endif // HL2SB
 
 	if (!pPlayer)
 		return;
@@ -1598,7 +1617,11 @@ void CWeaponRPG::PrimaryAttack( void )
 	WeaponSound( SINGLE );
 
 	// player "shoot" animation
+#ifdef HL2SB
+	pPlayer->DoAnimationEvent( PLAYERANIMEVENT_ATTACK_PRIMARY );
+#else
 	pPlayer->SetAnimation( PLAYER_ATTACK1 );
+#endif // HL2SB
 }
 
 //-----------------------------------------------------------------------------
@@ -2115,6 +2138,21 @@ void CWeaponRPG::GetWeaponAttachment( int attachmentId, Vector &outVector, Vecto
 	}
 }
 
+#ifdef HL2SB
+//Tony; added so when the rpg switches to third person, the beam etc is re-created.
+void CWeaponRPG::ThirdPersonSwitch( bool bThirdPerson )
+{
+	if ( m_pBeam != NULL )
+	{
+		//Tell it to die right away and let the beam code free it.
+		m_pBeam->brightness = 0.0f;
+		m_pBeam->flags &= ~FBEAM_FOREVER;
+		m_pBeam->die = gpGlobals->curtime - 0.1;
+		m_pBeam = NULL;
+	}
+}
+#endif // HL2SB
+
 //-----------------------------------------------------------------------------
 // Purpose: Setup our laser beam
 //-----------------------------------------------------------------------------
@@ -2476,7 +2514,11 @@ int CLaserDot::DrawModel( int flags )
 	if ( pOwner != NULL && pOwner->IsDormant() == false )
 	{
 		// Always draw the dot in front of our faces when in first-person
+#ifdef HL2SB
+		if ( pOwner->IsLocalPlayer() && C_BasePlayer::LocalPlayerInFirstPersonView() )	//Tony; !!!
+#else
 		if ( pOwner->IsLocalPlayer() )
+#endif // HL2SB
 		{
 			// Take our view position and orientation
 			vecAttachment = CurrentViewOrigin();
@@ -2487,7 +2529,11 @@ int CLaserDot::DrawModel( int flags )
 			// Take the eye position and direction
 			vecAttachment = pOwner->EyePosition();
 			
+#ifdef HL2SB
+			QAngle angles = pOwner->EyeAngles();
+#else
 			QAngle angles = pOwner->GetAnimEyeAngles();
+#endif // HL2SB
 			AngleVectors( angles, &vecDir );
 		}
 		

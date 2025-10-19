@@ -95,5 +95,6 @@ private:
 
 	float				m_flTurnCorrectionTime;
 };
+#endif // !HL2SB
 
 #endif //HL2MP_PLAYER_SHARED_h

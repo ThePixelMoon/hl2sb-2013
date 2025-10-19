@@ -43,5 +43,8 @@ public:
 void DispatchEffectToCallback( const char *pEffectName, const CEffectData &m_EffectData );
 void DispatchEffect( const char *pName, const CEffectData &data );
 void DispatchEffect( const char *pName, const CEffectData &data, C_RecipientFilter &filter );
+#ifdef HL2SB
+void DispatchEffect( const char *pName, const CEffectData &data, IRecipientFilter &filter );
+#endif // HL2SB
 
 #endif // C_TE_EFFECT_DISPATCH_H

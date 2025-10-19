@@ -17,6 +17,15 @@
 #ifdef CLIENT_DLL
 #include "prediction.h"
 #endif
+#ifdef HL2SB
+	#ifdef HL2MP
+		#ifdef GAME_DLL
+			#include "hl2mp_player.h"
+		#else
+			#include "c_hl2mp_player.h"
+		#endif
+	#endif
+#endif
 
 #if defined(HL2_DLL) || defined(HL2_CLIENT_DLL)
 	#include "hl_movedata.h"
@@ -2419,7 +2428,15 @@ bool CGameMovement::CheckJumpButton( void )
 	
 	player->PlayStepSound( (Vector &)mv->GetAbsOrigin(), player->m_pSurfaceData, 1.0, true );
 	
+#ifndef HL2SB
 	MoveHelper()->PlayerSetAnimation( PLAYER_JUMP );
+#else
+	#ifdef HL2MP
+		CHL2MP_Player *pPlayer = ToHL2MPPlayer( player );
+		if ( pPlayer )
+			pPlayer->DoAnimationEvent( PLAYERANIMEVENT_JUMP );
+	#endif
+#endif
 
 	float flGroundFactor = 1.0f;
 	if (player->m_pSurfaceData)

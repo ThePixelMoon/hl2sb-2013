@@ -600,3 +600,4 @@ void CPlayerAnimState::GetOuterAbsVelocity( Vector& vel )
 	vel = GetOuter()->GetAbsVelocity();
 #endif
 }
+#endif // !HL2SB

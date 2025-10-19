@@ -1940,6 +1940,15 @@ void C_BasePlayer::ThirdPersonSwitch( bool bThirdperson )
 				}
 			}
 		}
+		
+#ifdef HL2SB
+		//Notify weapon.
+		CBaseCombatWeapon *pWeapon = GetActiveWeapon();
+		if ( pWeapon )
+		{
+			pWeapon->ThirdPersonSwitch( bThirdperson );
+		}
+#endif// HL2SB
 	}
 }
 

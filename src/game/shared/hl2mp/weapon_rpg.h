@@ -274,11 +274,16 @@ public:
 	CMaterialReference	m_hBeamMaterial;	// Used for the laser beam
 	Beam_t				*m_pBeam;			// Laser beam temp entity
 
+#ifdef HL2SB
+	//Tony; third person check thing, to destroy/reinitialize the beam ( swapping first -> third or back, etc )
+	virtual void			ThirdPersonSwitch( bool bThirdPerson );
+#endif // HL2SB
+
 #endif	//CLIENT_DLL
 
 	CBaseEntity *GetMissile( void ) { return m_hMissile; }
 
-#ifndef CLIENT_DLL
+#if !defined( CLIENT_DLL ) || defined( HL2SB )
 	DECLARE_ACTTABLE();
 #endif
 	

@@ -16,6 +16,9 @@ class CHL2MP_Player;
 #include "hl2_player.h"
 #include "simtimer.h"
 #include "soundenvelope.h"
+#ifdef HL2SB
+#include "hl2mp_playeranimstate.h"
+#endif // HL2SB
 #include "hl2mp_player_shared.h"
 #include "hl2mp_gamerules.h"
 #include "utldict.h"
@@ -101,7 +104,12 @@ public:
 
 	void NoteWeaponFired( void );
 
+#ifdef HL2SB
+	void SetAnimation( PLAYER_ANIM playerAnim );
+#else
 	void ResetAnimation( void );
+#endif // HL2SB
+
 	void SetPlayerModel( void );
 	void SetPlayerTeamModel( void );
 	Activity TranslateTeamActivity( Activity ActToTranslate );
@@ -152,7 +160,13 @@ public:
 private:
 
 	CNetworkQAngle( m_angEyeAngles );
+#ifndef HL2SB
 	CPlayerAnimState   m_PlayerAnimState;
+#endif // !HL2SB
+
+#ifdef HL2SB
+	CHL2MPPlayerAnimState *m_PlayerAnimState;
+#endif // HL2SB
 
 	int m_iLastWeaponFireUsercmd;
 	int m_iModelType;
@@ -174,6 +188,11 @@ private:
 
     bool m_bEnterObserver;
 	bool m_bReady;
+
+#ifdef HL2SB
+	CNetworkVar( int, m_cycleLatch ); // Network the cycle to clients periodically
+	CountdownTimer m_cycleLatchTimer;
+#endif // HL2SB
 };
 
 inline CHL2MP_Player *ToHL2MPPlayer( CBaseEntity *pEntity )

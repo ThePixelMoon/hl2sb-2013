@@ -44,10 +44,17 @@ ConVar	pistol_use_new_accuracy( "pistol_use_new_accuracy", "1", FCVAR_REPLICATED
 // CWeaponPistol
 //-----------------------------------------------------------------------------
 
+#ifdef HL2SB
+class CWeaponPistol : public CHL2MPMachineGun
+{
+public:
+	DECLARE_CLASS( CWeaponPistol, CHL2MPMachineGun );
+#else
 class CWeaponPistol : public CBaseHL2MPCombatWeapon
 {
 public:
 	DECLARE_CLASS( CWeaponPistol, CBaseHL2MPCombatWeapon );
+#endif // HL2SB
 
 	CWeaponPistol(void);
 
@@ -135,7 +142,7 @@ public:
 		return 0.5f; 
 	}
 	
-#ifndef CLIENT_DLL
+#if !defined( CLIENT_DLL ) || defined( HL2SB )
 	DECLARE_ACTTABLE();
 #endif
 
@@ -177,9 +184,24 @@ END_PREDICTION_DATA()
 LINK_ENTITY_TO_CLASS( weapon_pistol, CWeaponPistol );
 PRECACHE_WEAPON_REGISTER( weapon_pistol );
 
-#ifndef CLIENT_DLL
+#if !defined( CLIENT_DLL ) || defined( HL2SB )
 acttable_t CWeaponPistol::m_acttable[] = 
 {
+#ifdef HL2SB
+	{ ACT_MP_STAND_IDLE,				ACT_HL2MP_IDLE_PISTOL,					false },
+	{ ACT_MP_CROUCH_IDLE,				ACT_HL2MP_IDLE_CROUCH_PISTOL,			false },
+
+	{ ACT_MP_RUN,						ACT_HL2MP_RUN_PISTOL,					false },
+	{ ACT_MP_CROUCHWALK,				ACT_HL2MP_WALK_CROUCH_PISTOL,			false },
+
+	{ ACT_MP_ATTACK_STAND_PRIMARYFIRE,	ACT_HL2MP_GESTURE_RANGE_ATTACK_PISTOL,	false },
+	{ ACT_MP_ATTACK_CROUCH_PRIMARYFIRE,	ACT_HL2MP_GESTURE_RANGE_ATTACK_PISTOL,	false },
+
+	{ ACT_MP_RELOAD_STAND,				ACT_HL2MP_GESTURE_RELOAD_PISTOL,		false },
+	{ ACT_MP_RELOAD_CROUCH,				ACT_HL2MP_GESTURE_RELOAD_PISTOL,		false },
+
+	{ ACT_MP_JUMP,						ACT_HL2MP_JUMP_PISTOL,					false },
+#else
 	{ ACT_HL2MP_IDLE,					ACT_HL2MP_IDLE_PISTOL,					false },
 	{ ACT_HL2MP_RUN,					ACT_HL2MP_RUN_PISTOL,					false },
 	{ ACT_HL2MP_IDLE_CROUCH,			ACT_HL2MP_IDLE_CROUCH_PISTOL,			false },
@@ -429,6 +451,9 @@ bool CWeaponPistol::Reload( void )
 	if ( fRet )
 	{
 		WeaponSound( RELOAD );
+#ifdef HL2SB
+		ToHL2MPPlayer(GetOwner())->DoAnimationEvent( PLAYERANIMEVENT_RELOAD );
+#endif // HL2SB
 		m_flAccuracyPenalty = 0.0f;
 	}
 	return fRet;
