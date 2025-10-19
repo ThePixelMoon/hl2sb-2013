@@ -1,9 +1,0 @@
-diff a/src/game/shared/hl2mp/hl2mp_player_shared.h b/src/game/shared/hl2mp/hl2mp_player_shared.h	(rejected hunks)
-@@ -34,6 +34,7 @@ enum HL2MPPlayerState
- #define CHL2MP_Player C_HL2MP_Player
- #endif
- 
-+#ifndef HL2SB
- class CPlayerAnimState
- {
- public:

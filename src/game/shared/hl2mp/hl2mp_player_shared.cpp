@@ -25,6 +25,11 @@
 #include "lvphysics_interface.h"
 #endif
 
+#ifdef HL2SB
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+#endif // HL2SB
+
 extern ConVar sv_footsteps;
 
 const char *g_ppszPlayerSoundPrefixNames[PLAYER_SOUNDS_MAX] =
@@ -146,7 +151,7 @@ void CHL2MP_Player::PlayStepSound( Vector &vecOrigin, surfacedata_t *psurface, f
 }
 #endif
 
-
+#ifndef HL2SB
 //==========================
 // ANIMATION CODE
 //==========================

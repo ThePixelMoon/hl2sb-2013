@@ -36,6 +36,7 @@ enum HL2MPPlayerState
 
 class CHL2MP_Player;
 
+#ifndef HL2SB
 class CPlayerAnimState
 {
 public:
