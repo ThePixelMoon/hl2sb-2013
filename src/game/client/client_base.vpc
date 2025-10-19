@@ -1388,11 +1388,11 @@ $Project
 		$Lib		vtf
 		$Lib		lua51 [$LINUXALL]
 
-		$File "$SRCDIR\lib\x64\releasel\lua51.lib" [$WINDOWS]
+		$File "$SRCDIR\lib\public\x64\releasel\lua51.lib" [$WINDOWS]
 		{
 			$Configuration "Debug" 	{ $ExcludedFromBuild "Yes" }
 		}
-		$File "$SRCDIR\lib\x64\debugl\lua51.lib" [$WINDOWS]
+		$File "$SRCDIR\lib\public\x64\debugl\lua51.lib" [$WINDOWS]
 		{
 			$Configuration "Release" { $ExcludedFromBuild "Yes" }
 		}
