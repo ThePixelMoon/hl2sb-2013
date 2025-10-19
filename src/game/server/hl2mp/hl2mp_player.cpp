@@ -22,6 +22,10 @@
 #include "gamestats.h"
 #include "ammodef.h"
 #include "NextBot.h"
+#ifdef HL2SB
+#include "tier0/vprof.h"
+#include "bone_setup.h"
+#endif // HL2SB
 
 #include "engine/IEngineSound.h"
 #include "SoundEmitterSystem/isoundemittersystembase.h"
@@ -34,6 +38,11 @@
 #include "lhl2mp_player_shared.h"
 #include "ltakedamageinfo.h"
 #endif
+
+#ifdef HL2SB
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+#endif // HL2SB
 
 int g_iLastCitizenModel = 0;
 int g_iLastCombineModel = 0;
@@ -520,6 +529,13 @@ void CHL2MP_Player::Spawn(void)
 	SetPlayerUnderwater(false);
 
 	m_bReady = false;
+
+#ifdef HL2SB
+	m_cycleLatchTimer.Start( CYCLELATCH_UPDATE_INTERVAL );
+
+	//Tony; do the spawn animevent
+	DoAnimationEvent( PLAYERANIMEVENT_SPAWN );
+#endif // HL2SB
 }
 
 void CHL2MP_Player::PickupObject( CBaseEntity *pObject, bool bLimitMassAndSize )
