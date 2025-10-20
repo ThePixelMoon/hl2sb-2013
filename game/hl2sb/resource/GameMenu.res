@@ -11,7 +11,7 @@
 		"label" "#GameUI_GameMenu_Disconnect"
 		"command" "Disconnect"
 		"OnlyInGame" "1"
-		"notsingle" "1"
+		//"notsingle" "1"
 	}
 	"3"
 	{
@@ -25,7 +25,7 @@
 		"label" ""
 		"command" ""
 		"OnlyInGame" "1"
-		"notsingle" "1"
+		//"notsingle" "1"
 	}
 	// "5"	
 	// {
